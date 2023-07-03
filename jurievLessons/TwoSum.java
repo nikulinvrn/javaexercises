@@ -6,5 +6,11 @@ package jurievLessons;
 //Output: [0,1]
 //Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].
 public class TwoSum {
+    public static int[] twoSum(int[] nums, int target) {
+        int[] result = new int[2];
 
+
+
+        return result;
+    }
 }
