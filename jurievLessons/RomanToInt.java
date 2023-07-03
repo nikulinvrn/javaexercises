@@ -4,53 +4,45 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class RomanToInt {
-    static String s;
+    static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
         System.out.println("Ввведите римское число и нажмите Enter: ");
-        s = scanner.nextLine();
-
-        calculateInt(splitRomanianToInt(s));
+        String inputString = scanner.nextLine();
+        calculateInt(splitRomanianToInt(inputString));
     }
 
-    public static int[] splitRomanianToInt(String s){
-        String[] symbolBuffer = new String[s.length()];
-
-        for(int i=0; i < s.length(); i++){
-            symbolBuffer[i] = s.substring(i,i+1);
-            // System.out.println("Символ " + i + " = " + symbolBuffer[i]);
+    public static int[] splitRomanianToInt(String romanNumStr) {
+        int[] numBuffer = new int[romanNumStr.length()];
+        for (int i = 0; i < numBuffer.length; i++) {
+            numBuffer[i] = decoder(romanNumStr.charAt(i));
         }
 
-        int[] numBuffer = new int[symbolBuffer.length];
-        for(int i=0; i < symbolBuffer.length; i++){
-            if (Arrays.asList(symbolBuffer[i]).contains("I")) {numBuffer[i] = 1;}
-            else if (Arrays.asList(symbolBuffer[i]).contains("V")) {numBuffer[i] = 5;}
-            else if (Arrays.asList(symbolBuffer[i]).contains("X")) {numBuffer[i] = 10;}
-            else if (Arrays.asList(symbolBuffer[i]).contains("L")) {numBuffer[i] = 50;}
-            else if (Arrays.asList(symbolBuffer[i]).contains("C")) {numBuffer[i] = 100;}
-            else if (Arrays.asList(symbolBuffer[i]).contains("D")) {numBuffer[i] = 500;}
-            else if (Arrays.asList(symbolBuffer[i]).contains("M")) {numBuffer[i] = 1000;}
-            else {
-                System.out.println("Введенная строка имеет недопустимые символы");
-            }
-        }
         return numBuffer;
     }
 
-    public static void calculateInt (int[] intNumberList){
+    public static int decoder(char ch) {
+        if (ch == 'I') return 1;
+        else if (ch == 'V') return 5;
+        else if (ch == 'X') return 10;
+        else if (ch == 'L') return 50;
+        else if (ch == 'C') return 100;
+        else if (ch == 'D') return 500;
+        else if (ch == 'M') return 1000;
+
+        return 0; // в идеале throw
+    }
+
+    public static void calculateInt(int[] intNumberList) { //  нужно
         int resultNumber = 0;
-        for(int i = intNumberList.length - 1; i >= 0; i--){
+        for (int i = intNumberList.length - 1; i >= 0; i--) {
             if (i == intNumberList.length - 1) {
                 resultNumber += intNumberList[i];
-                continue;
             } else {
-                if (intNumberList[i+1] > intNumberList[i]){
+                if (intNumberList[i + 1] > intNumberList[i]) {
                     resultNumber -= intNumberList[i];
-                    continue;
-                } else if (intNumberList[i+1] <= intNumberList[i]){
+                } else if (intNumberList[i + 1] <= intNumberList[i]) {
                     resultNumber += intNumberList[i];
-                    continue;
                 } else {
                     System.out.println("Я не понимаю что происходит. Если бы мы знали, что это такое, но мы не знаем что это такое.. Очень страшно.");
                 }
