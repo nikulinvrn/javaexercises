@@ -1,4 +1,4 @@
-import jurievLessons.Lesson_2.CustomList;
+import yurievLessons.Lesson_2.CustomList;
 
 public class Main {
     public static void main(String[] args) {

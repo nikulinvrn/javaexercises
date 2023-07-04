@@ -1,4 +1,4 @@
-package jurievLessons.Lesson_1;
+package yurievLessons.Lesson_1;
 
 public class IntToRom {
     public static void main(String []args){

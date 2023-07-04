@@ -1,6 +1,5 @@
-package jurievLessons.Lesson_1;
+package yurievLessons.Lesson_1;
 
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class RomanToInt {
