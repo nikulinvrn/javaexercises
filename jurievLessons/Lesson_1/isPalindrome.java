@@ -1,4 +1,4 @@
-package jurievLessons;
+package jurievLessons.Lesson_1;
 
 public class isPalindrome {
     static int x = 31213;

@@ -1,5 +1,5 @@
-import jurievLessons.CustomList;
-import jurievLessons.TwoSum;
+import jurievLessons.Lesson_2.CustomList;
+
 public class Main {
     public static void main(String[] args) {
         // Here is the place for your advertisement =)

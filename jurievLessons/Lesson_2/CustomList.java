@@ -17,7 +17,7 @@
  *  2. Геттеры и сеттеры приватных переменных почистить от лишних (сгенерированных)
  */
 
-package jurievLessons;
+package jurievLessons.Lesson_2;
 
 import java.util.Arrays;
 import java.util.Objects;
