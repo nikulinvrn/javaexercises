@@ -58,26 +58,9 @@ public class CustomList {
         }
     }
 
-    public int[] getArray() {
-        int[] response = new int[size];
-        // Идея предлагает заменить на System.arraycopy(array, 0, response, 0, size);
-        for (int i = 0; i < size; i++) {
-            response[i] = array[i];
-        }
-
-        return response;
-    }
-
-    public void setArray(int[] array) {
-        this.array = array;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public void setSize(int size) { //и зачем оно мне тут? Оно должно инкрементироваться же ж или декрементироваться в работе
-        this.size = size;
+    private int[] expandArray(int[] arrayForExpend) {
+        int[] bufferArray = new int[arrayForExpend.length + arrayForExpend.length / 2];
+        return merge(arrayForExpend, bufferArray);
     }
 
     /**
@@ -98,16 +81,81 @@ public class CustomList {
         return toArray;
     }
 
+
+    public void add(int element) {
+        if (size >= this.array.length) {
+            this.array = expandArray(this.array);
+        }
+        this.array[size] = element;
+        size++;
+    }
+
+    public boolean add(int index, int element) {
+        if (index > size) {
+            System.out.printf("Добавление элемента не выполнено! \nВыход за пределы пользовательского массива, индекс не существует. \nArrayIndexOutOfBoundException: Index %d out of bounds for length %d \n", index, size);
+            return false;
+        }
+        if (this.array.length <= size) {
+            this.array = expandArray(this.array);
+        }
+        int[] arrayBuffer = merge(this.array, new int[this.array.length]);
+        for (int i = index; i < arrayBuffer.length - 1; i++) {
+            this.array[i + 1] = arrayBuffer[i];
+        }
+        this.array[index] = element;
+        size++;
+
+        return true;
+    }
+
+    public void add(int[] elements) {
+        while (size + elements.length >= this.array.length) {
+            this.array = expandArray(this.array);
+        }
+        for (int i = 0; i < elements.length; i++) {
+            this.array[i + size] = elements[i];
+        }
+        size += elements.length;
+    }
+
+    public void add(int index, int[] elements) {
+        while (size + elements.length >= this.array.length) {
+            this.array = expandArray(this.array);
+        }
+        int[] bufferArray = merge(this.array, new int[this.array.length]);
+        for (int i = 0; i < elements.length; i++) {
+            this.array[i + index] = elements[i];
+        }
+        for(int i = 0; i <= size - (elements.length -1); i++){
+            this.array[index + elements.length + i] = bufferArray[index + i];
+        }
+        size += elements.length;
+    }
+
+    public int[] getArray() {
+        int[] userArray = new int[size];
+        // Идея предлагает заменить на System.arraycopy(array, 0, userArray, 0, size);
+        for (int i = 0; i < size; i++) {
+            userArray[i] = array[i];
+        }
+
+        return userArray;
+    }
+
+    public int length() {
+        return size;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof CustomList that)) return false; // что за that?
-        return getSize() == that.getSize() && Arrays.equals(getArray(), that.getArray());
+        return length() == that.length() && Arrays.equals(getArray(), that.getArray());
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(getSize());
+        int result = Objects.hash(length());
         result = 31 * result + Arrays.hashCode(getArray());
         return result;
     }
@@ -115,9 +163,15 @@ public class CustomList {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("CustomList{");
-        sb.append("array=").append(Arrays.toString(array));
-        sb.append('}');
+        final StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < size; i++) {
+            if (i < size - 1) {
+                sb.append(array[i]).append(", ");
+            } else {
+                sb.append(array[i]).append("]");
+            }
+        }
+
         return sb.toString();
     }
 }
