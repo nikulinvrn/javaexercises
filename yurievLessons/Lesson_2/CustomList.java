@@ -81,6 +81,14 @@ public class CustomList {
         return toArray;
     }
 
+    private boolean indexChecking(int index, int size){
+        if (index > size) {
+            System.out.printf("Добавление элемента не выполнено! \nВыход за пределы пользовательского массива, индекс не существует. \nArrayIndexOutOfBoundException: Index %d out of bounds for length %d \n", index, size);
+            return false;
+        }
+        return true;
+    }
+
 
     public void add(int element) {
         if (size >= this.array.length) {
@@ -91,10 +99,7 @@ public class CustomList {
     }
 
     public boolean add(int index, int element) {
-        if (index > size) {
-            System.out.printf("Добавление элемента не выполнено! \nВыход за пределы пользовательского массива, индекс не существует. \nArrayIndexOutOfBoundException: Index %d out of bounds for length %d \n", index, size);
-            return false;
-        }
+        if(indexChecking(index, size) == false) return false;
         if (this.array.length <= size) {
             this.array = expandArray(this.array);
         }
@@ -119,10 +124,7 @@ public class CustomList {
     }
 
     public boolean add(int index, int[] elements) {
-        if (index > size) {
-            System.out.printf("Добавление элемента не выполнено! \nВыход за пределы пользовательского массива, индекс не существует. \nArrayIndexOutOfBoundException: Index %d out of bounds for length %d \n", index, size);
-            return false;
-        }
+        if(indexChecking(index, size) == false) return false;
         int[] bufferArray = merge(this.array, new int[this.array.length]);
         while (size + elements.length >= this.array.length) {
             this.array = expandArray(this.array);

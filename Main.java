@@ -7,7 +7,7 @@ public class Main {
         System.out.println(list);
         System.out.println(list.lenght());
 
-        list.add(5, new int[]{1, 2, 3, 4, 5, 6});
+        list.add(15, new int[]{1, 2, 3, 4, 5, 6});
 
 
         System.out.println(list);
