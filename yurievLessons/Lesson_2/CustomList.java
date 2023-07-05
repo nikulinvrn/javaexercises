@@ -11,7 +11,7 @@
  *      + merge(int[] fromArray, int[] toArray) - соединить массивы с заменой элементов по индексу в целевом из исходного. Полезно в конструкторах и добавлении
  *      + remove(int index) - удалить элемент по индексу
  *      + removeElementWithValue(int element) - удалить элемент по значению
- *      remove(int... elements) - удалить n-индексов (реализовать через int... args) с пропорциональным уменьшением массива при необходимости
+ *      + remove(int... elements) - удалить n-индексов (реализовать через int... args) с пропорциональным уменьшением массива при необходимости
  *      + removeAllOfValue(int[] elements) - принимать массив чисел и удалять всякое вхождение в этот массив (аналог replace в строках)
  *      + getArray() - возвращение массива чисел, которые вводил пользователь (с отсечением хвоста из нулей)
  *      + replaceByIndex(int index, int element) - замена в индексе (почему не через присваивание? фиг с ним, больше инкапсуляции богу инкапсуляции)
@@ -46,7 +46,7 @@ public class CustomList {
      */
     public CustomList(int[] array) {
         this.size = array.length;
-        if (size <= CUSTOM_ARRAY_CAPACITY) {
+        if (this.size <= CUSTOM_ARRAY_CAPACITY) {
             this.array = new int[CUSTOM_ARRAY_CAPACITY];
             merge(array, this.array);
         } else {
@@ -95,16 +95,16 @@ public class CustomList {
     }
 
     public void add(int element) {
-        if (size >= this.array.length) {
+        if (this.size >= this.array.length) {
             this.array = expandArray(this.array);
         }
-        this.array[size] = element;
-        size++;
+        this.array[this.size] = element;
+        this.size++;
     }
 
-    public boolean add(int index, int element) {
-        if (!indexChecking(index, size)) return false;
-        if (this.array.length <= size) {
+    public void add(int index, int element) {
+        if (!indexChecking(index, this.size)) return;
+        if (this.array.length <= this.size) {
             this.array = expandArray(this.array);
         }
         int[] arrayBuffer = merge(this.array, new int[this.array.length]);
@@ -112,13 +112,11 @@ public class CustomList {
             this.array[i + 1] = arrayBuffer[i];
         }
         this.array[index] = element;
-        size++;
-
-        return true;
+        this.size++;
     }
 
     public void add(int[] elements) {
-        while (size + elements.length >= this.array.length) {
+        while (this.size + elements.length >= this.array.length) {
             this.array = expandArray(this.array);
         }
         for (int i = 0; i < elements.length; i++) {
@@ -127,38 +125,37 @@ public class CustomList {
         size += elements.length;
     }
 
-    public boolean add(int index, int[] elements) {
-        if (!indexChecking(index, size)) return false;
+    public void add(int index, int[] elements) {
+        if (!indexChecking(index, this.size)) return;
         int[] bufferArray = merge(this.array, new int[this.array.length]);
-        while (size + elements.length >= this.array.length) {
+        while (this.size + elements.length >= this.array.length) {
             this.array = expandArray(this.array);
         }
         for (int i = 0; i < elements.length; i++) {
             this.array[i + index] = elements[i];
         }
-        for (int i = 0; i < size - index; i++) {
+        for (int i = 0; i < this.size - index; i++) {
             this.array[i + index + elements.length] = bufferArray[i + index];
         }
-        size += elements.length;
-        return true;
+        this.size += elements.length;
     }
 
     public int[] getArray() {
-        int[] userArray = new int[size];
+        int[] userArray = new int[this.size];
         // IDEA предлагает заменить на System.arraycopy(array, 0, userArray, 0, size);
-        for (int i = 0; i < size; i++) {
-            userArray[i] = array[i];
+        for (int i = 0; i < this.size; i++) {
+            userArray[i] = this.array[i];
         }
 
         return userArray;
     }
 
     public int length() {
-        return size;
+        return this.size;
     }
 
     public boolean replaceByIndex(int index, int element) {
-        if (!indexChecking(index, size)) {
+        if (!indexChecking(index, this.size)) {
             return false;
         }
         this.array[index] = element;
@@ -167,7 +164,7 @@ public class CustomList {
     }
 
     public void remove(int index) {
-        if (!indexChecking(index, size)) {
+        if (!indexChecking(index, this.size)) {
             return;
         }
         int[] arrayBuffer = new int[this.array.length];
@@ -179,7 +176,7 @@ public class CustomList {
                 this.array[i] = arrayBuffer[i + 1];
             }
         }
-        size--;
+        this.size--;
     }
 
     /**
@@ -191,10 +188,10 @@ public class CustomList {
     public void removeElementWithValue(int value) {
         CustomList removableArray = new CustomList(this.array);
         boolean isRemoved = false;
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < this.size; i++) {
             if (removableArray.getValue(i) == value) {
                 removableArray.remove(i);
-                size--;
+                this.size--;
                 isRemoved = true;
             }
         }
@@ -211,8 +208,8 @@ public class CustomList {
         for (int i = 0; i < list.length(); i++) {
             if (list.getValue(i) == elements[0]) {
                 cursor = i;
-                for (int j = 0; j < elements.length; j++) {
-                    if (list.getValue(cursor) == elements[j]) {
+                for (int element : elements) {
+                    if (list.getValue(cursor) == element) {
                         coincidenceCounter++;
                         cursor++;
                     }
@@ -223,13 +220,12 @@ public class CustomList {
             } else {
                 while (cursor > i) {
                     list.remove(cursor - 1);
-                    size--;
+                    this.size--;
                     cursor--;
                 }
                 coincidenceCounter = 0;
             }
         }
-
         this.array = list.getArray();
     }
 
@@ -241,7 +237,7 @@ public class CustomList {
             modifiedList.remove(indexes[counter]-flagCorrector);
             flagCorrector++;
             counter++;
-            size--;
+            this.size--;
         }
         this.array = modifiedList.getArray();
     }
@@ -265,8 +261,8 @@ public class CustomList {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("[");
-        for (int i = 0; i < size; i++) {
-            if (i < size - 1) {
+        for (int i = 0; i < this.size; i++) {
+            if (i < this.size - 1) {
                 sb.append(array[i]).append(", ");
             } else {
                 sb.append(array[i]).append("]");
