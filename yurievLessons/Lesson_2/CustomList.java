@@ -1,4 +1,4 @@
-/**
+/*
  * Задание:
  *  1. Реализовать методы:
  *      add(int element) - добавить элемент в конец массива (с проверкой длины, увеличение в полтора раза)
@@ -7,6 +7,7 @@
  *      add(int[] elements) - добавить массив чисел в конец
  *      add(int index, int[] elements) - добавить массив чисел в начало
  *                                     - добавить массив чисел по индексу (начиная с индекса)
+ *      merge(int[] fromArray, int[] toArray) - соединить массивы с заменой элементов по индексу в целевом из исходного. Полезно в конструкторах и добавлении
  *      remove(int index) - удалить объект по индексу
  *      remove(int element) - удалить объект по значению
  *      remove(int... elements) - удалить n-индексов (реализовать через int... args) с пропорциональным уменьшением массива при необходимости
@@ -14,6 +15,7 @@
  *      removeAll(int[] elements) - принимать массив чисел и удалять всякое вхождение в этот массив (аналог replace в строках)
  *      replaceByIndex(int index, int element) - замена в индексе (почему не через присваивание? фиг с ним, больше инкапсуляции богу инкапсуляции)
  *      length() - вернуть длину массива без хвоста из нулей
+ *
  *  2. Геттеры и сеттеры приватных переменных почистить от лишних (сгенерированных)
  */
 
@@ -25,14 +27,45 @@ import java.util.Objects;
 public class CustomList {
     private int[] array;
     private int size;
+    private int cursor; // могу ли обойтись size'ом?
+    private static final int CUSTOM_ARRAY_CAPACITY = 10;
 
-    public CustomList(int[] array, int size) {
-        this.array = array;
-        this.size = size;
+    /**
+     * Конструктор при путых параметрах: создаем массив емкостью CUSTOM_ARRAY_CAPACITY и числом пользовательских элементов 0
+     */
+    public CustomList() {
+        this.array = new int[CUSTOM_ARRAY_CAPACITY];
+        this.size = 0;
     }
 
-    public int[] getArray() { // он тут вообще нужен? Возвращать с хвостом не труЪ. В хеш и иквалз можно передавать поле внутри класса (this.array)
-        return array;
+    /**
+     * Конструктор с передачей ссылки на существующий массив: число пользовательских элементов вычисляется через размер исходного массива, емкость CustomList'а формируем через проверку соответствия длины пользовательского массива текущей ёмкости CustomList'a.
+     *
+     * @param array
+     */
+    public CustomList(int[] array) {
+        this.size = array.length;
+        if (size <= CUSTOM_ARRAY_CAPACITY) {
+            this.array = new int[CUSTOM_ARRAY_CAPACITY];
+            merge(array, this.array);
+        } else {
+            int arrayCapacity = CUSTOM_ARRAY_CAPACITY;
+            while (array.length > arrayCapacity) {
+                arrayCapacity += arrayCapacity / 2;
+            }
+            this.array = new int[arrayCapacity];
+            merge(array, this.array);
+        }
+    }
+
+    public int[] getArray() {
+        int[] response = new int[size];
+        // Идея предлагает заменить на System.arraycopy(array, 0, response, 0, size);
+        for (int i = 0; i < size; i++) {
+            response[i] = array[i];
+        }
+
+        return response;
     }
 
     public void setArray(int[] array) {
@@ -45,6 +78,24 @@ public class CustomList {
 
     public void setSize(int size) { //и зачем оно мне тут? Оно должно инкрементироваться же ж или декрементироваться в работе
         this.size = size;
+    }
+
+    /**
+     * Метод заполняет элементами исхоодного массива начало массива целевого с заменой элементов по индексу.
+     *
+     * @param fromArray
+     * @param toArray
+     * @return конечный массив с замененными элементами. Если целевой массив меньше исходного — возвращаем исходный массив.
+     */
+    private int[] merge(int[] fromArray, int[] toArray) {
+        if (fromArray.length > toArray.length) {
+            return fromArray;
+        }
+        for (int i = 0; i < fromArray.length; i++) {
+            toArray[i] = fromArray[i];
+        }
+
+        return toArray;
     }
 
     @Override
