@@ -12,7 +12,7 @@
  *      + remove(int index) - удалить элемент по индексу
  *      + removeElementWithValue(int element) - удалить элемент по значению
  *      remove(int... elements) - удалить n-индексов (реализовать через int... args) с пропорциональным уменьшением массива при необходимости
- *      removeAll(int[] elements) - принимать массив чисел и удалять всякое вхождение в этот массив (аналог replace в строках)
+ *      + removeAllOfValue(int[] elements) - принимать массив чисел и удалять всякое вхождение в этот массив (аналог replace в строках)
  *      + getArray() - возвращение массива чисел, которые вводил пользователь (с отсечением хвоста из нулей)
  *      + replaceByIndex(int index, int element) - замена в индексе (почему не через присваивание? фиг с ним, больше инкапсуляции богу инкапсуляции)
  *      + length() - вернуть длину массива без хвоста из нулей
@@ -204,7 +204,7 @@ public class CustomList {
         }
     }
 
-    public void removeAll(int[] elements) {
+    public void removeAllOfValue(int[] elements) {
         CustomList list = new CustomList(this.array);
         int coincidenceCounter = 0;
         int cursor = 0;
@@ -231,6 +231,19 @@ public class CustomList {
         }
 
         this.array = list.getArray();
+    }
+
+    public void removeAllOfIndex(int ... indexes) {
+        CustomList modifiedList = new CustomList(this.array);
+        int counter = 0;
+        int flagCorrector = 0;
+        while(counter < indexes.length){
+            modifiedList.remove(indexes[counter]-flagCorrector);
+            flagCorrector++;
+            counter++;
+            size--;
+        }
+        this.array = modifiedList.getArray();
     }
 
 

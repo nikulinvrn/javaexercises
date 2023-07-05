@@ -11,7 +11,8 @@ public class Main {
 //        list.replaceByIndex(11, 10001);
 
         System.out.println(list);
-        list.removeAll(new int[]{1, 2, 3});
+        System.out.println(list.length());
+        list.removeAllOfIndex(9,8,7,6,5,4,3,2,1,0);
         System.out.println(list);
         System.out.println(list.length());
 
