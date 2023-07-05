@@ -28,7 +28,6 @@ import java.util.Objects;
 public class CustomList {
     private int[] array;
     private int size;
-    private int cursor; // могу ли обойтись size'ом?
     private static final int CUSTOM_ARRAY_CAPACITY = 10;
 
     /**

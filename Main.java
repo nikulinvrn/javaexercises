@@ -11,33 +11,27 @@ public class Main {
         list.add(6);
         System.out.println(list);
 
-        list.add(0,0);
+        list.add(0, 0);
         System.out.println(list);
 
-        list.add(new int[]{7,8,9});
+        list.add(new int[]{7, 8, 9});
         System.out.println(list);
 
-        list.add(3, new int[]{33,22,11});
+        list.add(3, new int[]{33, 22, 11});
         System.out.println(list);
 
         System.out.println("Проверим методы удаления элемеентов: ");
         list.remove(0);
         System.out.println(list);
-        list.removeAllOfValue(new int[]{5,6});
+        list.removeAllOfValue(new int[]{5, 6});
         System.out.println(list);
-        list.removeAllOfIndex(new int[]{3,4});
+        list.removeAllOfIndex(3, 4);
         System.out.println(list);
         list.removeElementWithValue(33);
         System.out.println(list);
 
-
-
-
-
-
-
-
-
-
+        System.out.println("Заменим первый элемент: ");
+        list.replaceByIndex(0, 1001);
+        System.out.println(list);
     }
 }
