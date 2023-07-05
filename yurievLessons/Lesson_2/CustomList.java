@@ -1,20 +1,20 @@
 /*
  * Задание:
  *  1. Реализовать методы:
- *      add(int element) - добавить элемент в конец массива (с проверкой длины, увеличение в полтора раза)
- *      add(int index, int element) - добавить элемент в начало массива
- *                                  - добавить элемент в массив по индексу
- *      add(int[] elements) - добавить массив чисел в конец
- *      add(int index, int[] elements) - добавить массив чисел в начало
- *                                     - добавить массив чисел по индексу (начиная с индекса)
- *      merge(int[] fromArray, int[] toArray) - соединить массивы с заменой элементов по индексу в целевом из исходного. Полезно в конструкторах и добавлении
+ *      + add(int element) - добавить элемент в конец массива (с проверкой длины, увеличение в полтора раза)
+ *      + add(int index, int element) - добавить элемент в начало массива
+ *      +                             - добавить элемент в массив по индексу
+ *      + add(int[] elements) - добавить массив чисел в конец
+ *      + add(int index, int[] elements) - добавить массив чисел в начало
+ *      +                               - добавить массив чисел по индексу (начиная с индекса)
+ *      + merge(int[] fromArray, int[] toArray) - соединить массивы с заменой элементов по индексу в целевом из исходного. Полезно в конструкторах и добавлении
  *      remove(int index) - удалить объект по индексу
  *      remove(int element) - удалить объект по значению
  *      remove(int... elements) - удалить n-индексов (реализовать через int... args) с пропорциональным уменьшением массива при необходимости
- *      getArray() - возвращение массива чисел, которые вводил пользователь (с отсечением хвоста из нулей)
  *      removeAll(int[] elements) - принимать массив чисел и удалять всякое вхождение в этот массив (аналог replace в строках)
- *      replaceByIndex(int index, int element) - замена в индексе (почему не через присваивание? фиг с ним, больше инкапсуляции богу инкапсуляции)
- *      length() - вернуть длину массива без хвоста из нулей
+ *      + getArray() - возвращение массива чисел, которые вводил пользователь (с отсечением хвоста из нулей)
+ *      + replaceByIndex(int index, int element) - замена в индексе (почему не через присваивание? фиг с ним, больше инкапсуляции богу инкапсуляции)
+ *      + length() - вернуть длину массива без хвоста из нулей
  *
  *  2. Геттеры и сеттеры приватных переменных почистить от лишних (сгенерированных)
  */
@@ -82,8 +82,8 @@ public class CustomList {
     }
 
     private boolean indexChecking(int index, int size){
-        if (index > size) {
-            System.out.printf("Добавление элемента не выполнено! \nВыход за пределы пользовательского массива, индекс не существует. \nArrayIndexOutOfBoundException: Index %d out of bounds for length %d \n", index, size);
+        if (index > size - 1) {
+            System.out.printf("Выход за пределы пользовательского массива, индекс не существует. \nArrayIndexOutOfBoundException: Index %d out of bounds for length %d \n", index, size);
             return false;
         }
         return true;
@@ -99,7 +99,7 @@ public class CustomList {
     }
 
     public boolean add(int index, int element) {
-        if(indexChecking(index, size) == false) return false;
+        if(!indexChecking(index, size)) return false;
         if (this.array.length <= size) {
             this.array = expandArray(this.array);
         }
@@ -124,7 +124,7 @@ public class CustomList {
     }
 
     public boolean add(int index, int[] elements) {
-        if(indexChecking(index, size) == false) return false;
+        if(!indexChecking(index, size)) return false;
         int[] bufferArray = merge(this.array, new int[this.array.length]);
         while (size + elements.length >= this.array.length) {
             this.array = expandArray(this.array);
@@ -141,7 +141,7 @@ public class CustomList {
 
     public int[] getArray() {
         int[] userArray = new int[size];
-        // Идея предлагает заменить на System.arraycopy(array, 0, userArray, 0, size);
+        // IDEA предлагает заменить на System.arraycopy(array, 0, userArray, 0, size);
         for (int i = 0; i < size; i++) {
             userArray[i] = array[i];
         }
@@ -149,20 +149,47 @@ public class CustomList {
         return userArray;
     }
 
-    public int lenght() {
+    public int length() {
         return size;
+    }
+
+    public boolean replaceByIndex(int index, int element){
+        if(!indexChecking(index,size)){
+            return false;
+        }
+        this.array[index] = element;
+
+        return true;
+    }
+
+    public boolean remove(int index){
+        if(!indexChecking(index, size)){
+            return false;
+        }
+        int[] arrayBuffer = new int[this.array.length];
+        for (int i = 0; i < this.array.length; i++) {
+            arrayBuffer[i] = this.array[i];
+        }
+        for (int i = 0; i < this.array.length; i++) {
+            if(i >= index && i < arrayBuffer.length - 1){
+                this.array[i] = arrayBuffer[i+1];
+            }
+        }
+        size--;
+
+        return true;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof CustomList that)) return false; // что за that?
-        return lenght() == that.lenght() && Arrays.equals(getArray(), that.getArray());
+        return length() == that.length() && Arrays.equals(getArray(), that.getArray());
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(lenght());
+        int result = Objects.hash(length());
         result = 31 * result + Arrays.hashCode(getArray());
         return result;
     }
