@@ -1,5 +1,6 @@
 /*
  * Задание:
+ *                      boolean из методов можно убрать, использовать для выхода просто return;
  *  1. Реализовать методы:
  *      + add(int element) - добавить элемент в конец массива (с проверкой длины, увеличение в полтора раза)
  *      + add(int index, int element) - добавить элемент в начало массива
@@ -8,8 +9,8 @@
  *      + add(int index, int[] elements) - добавить массив чисел в начало
  *      +                               - добавить массив чисел по индексу (начиная с индекса)
  *      + merge(int[] fromArray, int[] toArray) - соединить массивы с заменой элементов по индексу в целевом из исходного. Полезно в конструкторах и добавлении
- *      remove(int index) - удалить объект по индексу
- *      remove(int element) - удалить объект по значению
+ *      + remove(int index) - удалить элемент по индексу
+ *      + removeElementWithValue(int element) - удалить элемент по значению
  *      remove(int... elements) - удалить n-индексов (реализовать через int... args) с пропорциональным уменьшением массива при необходимости
  *      removeAll(int[] elements) - принимать массив чисел и удалять всякое вхождение в этот массив (аналог replace в строках)
  *      + getArray() - возвращение массива чисел, которые вводил пользователь (с отсечением хвоста из нулей)
@@ -81,7 +82,7 @@ public class CustomList {
         return toArray;
     }
 
-    private boolean indexChecking(int index, int size){
+    private boolean indexChecking(int index, int size) {
         if (index > size - 1) {
             System.out.printf("Выход за пределы пользовательского массива, индекс не существует. \nArrayIndexOutOfBoundException: Index %d out of bounds for length %d \n", index, size);
             return false;
@@ -89,6 +90,9 @@ public class CustomList {
         return true;
     }
 
+    public int getValue(int index) {
+        return this.array[index];
+    }
 
     public void add(int element) {
         if (size >= this.array.length) {
@@ -99,7 +103,7 @@ public class CustomList {
     }
 
     public boolean add(int index, int element) {
-        if(!indexChecking(index, size)) return false;
+        if (!indexChecking(index, size)) return false;
         if (this.array.length <= size) {
             this.array = expandArray(this.array);
         }
@@ -124,7 +128,7 @@ public class CustomList {
     }
 
     public boolean add(int index, int[] elements) {
-        if(!indexChecking(index, size)) return false;
+        if (!indexChecking(index, size)) return false;
         int[] bufferArray = merge(this.array, new int[this.array.length]);
         while (size + elements.length >= this.array.length) {
             this.array = expandArray(this.array);
@@ -153,8 +157,8 @@ public class CustomList {
         return size;
     }
 
-    public boolean replaceByIndex(int index, int element){
-        if(!indexChecking(index,size)){
+    public boolean replaceByIndex(int index, int element) {
+        if (!indexChecking(index, size)) {
             return false;
         }
         this.array[index] = element;
@@ -162,23 +166,73 @@ public class CustomList {
         return true;
     }
 
-    public boolean remove(int index){
-        if(!indexChecking(index, size)){
-            return false;
+    public void remove(int index) {
+        if (!indexChecking(index, size)) {
+            return;
         }
         int[] arrayBuffer = new int[this.array.length];
         for (int i = 0; i < this.array.length; i++) {
             arrayBuffer[i] = this.array[i];
         }
         for (int i = 0; i < this.array.length; i++) {
-            if(i >= index && i < arrayBuffer.length - 1){
-                this.array[i] = arrayBuffer[i+1];
+            if (i >= index && i < arrayBuffer.length - 1) {
+                this.array[i] = arrayBuffer[i + 1];
             }
         }
         size--;
-
-        return true;
     }
+
+    /**
+     * Удаляет все вхождения. Можно доработать до удаления только первого, только последнего или i-го вхождения.
+     *
+     * @param value
+     * @return
+     */
+    public void removeElementWithValue(int value) {
+        CustomList removableArray = new CustomList(this.array);
+        boolean isRemoved = false;
+        for (int i = 0; i < size; i++) {
+            if (removableArray.getValue(i) == value) {
+                removableArray.remove(i);
+                size--;
+                isRemoved = true;
+            }
+        }
+        this.array = removableArray.getArray();
+        if (!isRemoved) {
+            System.out.println("Совпадений в массиве не найдено.");
+        }
+    }
+
+    public void removeAll(int[] elements) {
+        CustomList list = new CustomList(this.array);
+        int coincidenceCounter = 0;
+        int cursor = 0;
+        for (int i = 0; i < list.length(); i++) {
+            if (list.getValue(i) == elements[0]) {
+                cursor = i;
+                for (int j = 0; j < elements.length; j++) {
+                    if (list.getValue(cursor) == elements[j]) {
+                        coincidenceCounter++;
+                        cursor++;
+                    }
+                }
+            }
+            if (coincidenceCounter != elements.length) {
+                cursor = 0;
+            } else {
+                while (cursor > i) {
+                    list.remove(cursor - 1);
+                    size--;
+                    cursor--;
+                }
+                coincidenceCounter = 0;
+            }
+        }
+
+        this.array = list.getArray();
+    }
+
 
     @Override
     public boolean equals(Object o) {
