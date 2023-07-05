@@ -118,18 +118,23 @@ public class CustomList {
         size += elements.length;
     }
 
-    public void add(int index, int[] elements) {
+    public boolean add(int index, int[] elements) {
+        if (index > size) {
+            System.out.printf("Добавление элемента не выполнено! \nВыход за пределы пользовательского массива, индекс не существует. \nArrayIndexOutOfBoundException: Index %d out of bounds for length %d \n", index, size);
+            return false;
+        }
+        int[] bufferArray = merge(this.array, new int[this.array.length]);
         while (size + elements.length >= this.array.length) {
             this.array = expandArray(this.array);
         }
-        int[] bufferArray = merge(this.array, new int[this.array.length]);
         for (int i = 0; i < elements.length; i++) {
             this.array[i + index] = elements[i];
         }
-        for(int i = 0; i <= size - (elements.length -1); i++){
-            this.array[index + elements.length + i] = bufferArray[index + i];
+        for (int i = 0; i < size - index; i++) {
+            this.array[i + index + elements.length] = bufferArray[i + index];
         }
         size += elements.length;
+        return true;
     }
 
     public int[] getArray() {
@@ -142,7 +147,7 @@ public class CustomList {
         return userArray;
     }
 
-    public int length() {
+    public int lenght() {
         return size;
     }
 
@@ -150,12 +155,12 @@ public class CustomList {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof CustomList that)) return false; // что за that?
-        return length() == that.length() && Arrays.equals(getArray(), that.getArray());
+        return lenght() == that.lenght() && Arrays.equals(getArray(), that.getArray());
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(length());
+        int result = Objects.hash(lenght());
         result = 31 * result + Arrays.hashCode(getArray());
         return result;
     }
