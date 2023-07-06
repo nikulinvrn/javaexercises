@@ -154,7 +154,7 @@ public class CustomList {
     }
 
     public void replaceByIndex(int index, int element) {
-        if (!checkingIndexForUnexistence(index, this.size)) {
+        if (checkingIndexForUnexistence(index, this.size)) {
             return;
         }
         this.array[index] = element;
