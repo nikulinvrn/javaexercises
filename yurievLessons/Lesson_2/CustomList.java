@@ -80,15 +80,16 @@ public class CustomList {
         return toArray;
     }
 
-    private boolean indexChecking(int index, int size) {
-        if (index > size - 1) {
-            System.out.printf("Выход за пределы пользовательского массива, индекс не существует. \nArrayIndexOutOfBoundException: Index %d out of bounds for length %d \n", index, size);
-            return false;
+    private boolean checkingIndexForUnexistence(int index, int arrayLength) {
+        if (index > arrayLength - 1) {
+            System.out.printf("Выход за пределы пользовательского массива, индекс не существует. \nArrayIndexOutOfBoundException: Index %d out of bounds for length %d \n", index, arrayLength);
+            return true;
         }
-        return true;
+        return false;
     }
 
     public int getValue(int index) {
+        if (checkingIndexForUnexistence(index, this.array.length)) return -1;
         return this.array[index];
     }
 
@@ -101,7 +102,7 @@ public class CustomList {
     }
 
     public void add(int index, int element) {
-        if (!indexChecking(index, this.size)) return;
+        if (checkingIndexForUnexistence(index, this.size)) return;
         if (this.array.length <= this.size) {
             this.array = expandArray(this.array);
         }
@@ -124,7 +125,7 @@ public class CustomList {
     }
 
     public void add(int index, int[] elements) {
-        if (!indexChecking(index, this.size)) return;
+        if (checkingIndexForUnexistence(index, this.size)) return;
         int[] bufferArray = merge(this.array, new int[this.array.length]);
         while (this.size + elements.length >= this.array.length) {
             this.array = expandArray(this.array);
@@ -152,17 +153,15 @@ public class CustomList {
         return this.size;
     }
 
-    public boolean replaceByIndex(int index, int element) {
-        if (!indexChecking(index, this.size)) {
-            return false;
+    public void replaceByIndex(int index, int element) {
+        if (!checkingIndexForUnexistence(index, this.size)) {
+            return;
         }
         this.array[index] = element;
-
-        return true;
     }
 
     public void remove(int index) {
-        if (!indexChecking(index, this.size)) {
+        if (checkingIndexForUnexistence(index, this.size)) {
             return;
         }
         int[] arrayBuffer = new int[this.array.length];
@@ -227,12 +226,12 @@ public class CustomList {
         this.array = list.getArray();
     }
 
-    public void removeAllOfIndex(int ... indexes) {
+    public void removeAllOfIndex(int... indexes) {
         CustomList modifiedList = new CustomList(this.array);
         int counter = 0;
         int flagCorrector = 0;
-        while(counter < indexes.length){
-            modifiedList.remove(indexes[counter]-flagCorrector);
+        while (counter < indexes.length) {
+            modifiedList.remove(indexes[counter] - flagCorrector);
             flagCorrector++;
             counter++;
             this.size--;
