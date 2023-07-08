@@ -27,7 +27,7 @@ public class Main {
         System.out.println(list);
         list.removeAllOfIndex(3, 4);
         System.out.println(list);
-        list.removeElementWithValue(33);
+        list.removeElementByValue(33);
         System.out.println(list);
 
         System.out.println("Заменим первый элемент: ");
