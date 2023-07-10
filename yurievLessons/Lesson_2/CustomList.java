@@ -127,7 +127,7 @@ public class CustomList {
                     size);
             return -1;
         }
-        return this.array[index];
+        return array[index];
     }
 
     public int[] getArray() {
@@ -206,7 +206,7 @@ public class CustomList {
     }
 
     public void removeAllOfValueList(int[] valueList) {
-        CustomList list = new CustomList(this.array);
+        CustomList list = new CustomList(array);
         int coincidenceCounter = 0;
         int cursor = 0;
         for (int i = 0; i < list.length(); i++) {
@@ -224,13 +224,13 @@ public class CustomList {
             } else {
                 while (cursor > i) {
                     list.remove(cursor - 1);
-                    this.size--;
+                    size--;
                     cursor--;
                 }
                 coincidenceCounter = 0;
             }
         }
-        this.array = list.getArray();
+        array = list.getArray();
     }
 
     private boolean isIndexInvalid(int index) {
