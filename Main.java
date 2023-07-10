@@ -1,5 +1,6 @@
 import yurievLessons.Lesson_2.CustomList;
 
+
 public class Main {
     public static void main(String[] args) {
         // Here is the place for your advertisement =)
@@ -11,27 +12,28 @@ public class Main {
         list.add(6);
         System.out.println(list);
 
-        list.add(0, 0);
+        list.insert(5, 0);
+        System.out.println(list);
+        list.addAll(new int[]{7, 8, 9});
         System.out.println(list);
 
-        list.add(new int[]{7, 8, 9});
-        System.out.println(list);
-
-        list.add(3, new int[]{33, 22, 11});
+        list.insertAll(2, new int[]{33, 22, 11, 9});
         System.out.println(list);
 
         System.out.println("Проверим методы удаления элемеентов: ");
         list.remove(0);
         System.out.println(list);
-        list.removeAllOfValue(new int[]{5, 6});
+        list.removeByValueOnce(33);
         System.out.println(list);
-        list.removeAllOfIndex(3, 4);
+        list.removeAllOfValueList(new int[]{2, 3});
+        list.removeByValueAll(9);
         System.out.println(list);
-        list.removeElementByValue(33);
+        list.removeAllOfIndexList(3, 4);
         System.out.println(list);
 
         System.out.println("Заменим первый элемент: ");
         list.replaceByIndex(0, 1001);
         System.out.println(list);
+        System.out.println("Длина массива: " + list.length());
     }
 }

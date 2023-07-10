@@ -7,7 +7,7 @@
  *      + add(int[] elements) - добавить массив чисел в конец
  *      + add(int index, int[] elements) - добавить массив чисел в начало
  *      +                               - добавить массив чисел по индексу (начиная с индекса)
- *      + merge(int[] fromArray, int[] toArray) - соединить массивы с заменой элементов по индексу в целевом из исходного. Полезно в конструкторах и добавлении
+ *      + merge(int[] fromArray, int[] toArray) - соединить массивы с заменой элементов по индексу в целевом из исходного
  *      + remove(int index) - удалить элемент по индексу
  *      + removeElementWithValue(int element) - удалить элемент по значению
  *      + remove(int... elements) - удалить n-индексов (реализовать через int... args) с пропорциональным уменьшением массива при необходимости
@@ -25,16 +25,12 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class CustomList {
-    private static final int CUSTOM_ARRAY_CAPACITY = 10;
+    private static final int DEFAULT_ARRAY_CAPACITY = 10;
     private int[] array;
     private int size;
 
-    /**
-     * Конструктор при путых параметрах: создаем массив емкостью CUSTOM_ARRAY_CAPACITY
-     * и числом пользовательских элементов 0
-     */
     public CustomList() {
-        this.array = new int[CUSTOM_ARRAY_CAPACITY];
+        this.array = new int[DEFAULT_ARRAY_CAPACITY];
         this.size = 0;
     }
 
@@ -43,195 +39,187 @@ public class CustomList {
         this.size = size;
     }
 
-    /**
-     * Конструктор с передачей ссылки на существующий массив: число пользовательских
-     * элементов вычисляется через размер исходного массива, емкость CustomList'а формируем
-     * через проверку соответствия длины пользовательского массива текущей ёмкости CustomList'a.
-     *
-     * @param array
-     */
     public CustomList(int[] array) {
         this.size = array.length;
         this.array = array;
-        /*if (this.size <= CUSTOM_ARRAY_CAPACITY) {
-            this.array = new int[CUSTOM_ARRAY_CAPACITY];
-            merge(array, this.array);
-        } else {
-            int arrayCapacity = CUSTOM_ARRAY_CAPACITY;
-            while (array.length > arrayCapacity) {
-                arrayCapacity += arrayCapacity / 2;
-            }
-            this.array = new int[arrayCapacity];
-            merge(array, this.array);
-        }*/
     }
 
+    private int[] expandArray(int[] array) {
+        int[] expandedArray = new int[array.length + array.length / 2];
+        System.arraycopy(array, 0, expandedArray, 0, array.length);
 
-    private int[] expandArray(int[] arrayForExpend) {
-        int[] bufferArray = new int[arrayForExpend.length + arrayForExpend.length / 2];
-        return merge(arrayForExpend, bufferArray);
+        return expandedArray;
     }
 
-    /**
-     * Метод заполняет элементами исхоодного массива начало массива целевого с заменой элементов по индексу.
-     *
-     * @param fromArray — исходный массив;
-     * @param toArray — целевой массив;
-     * @return конечный массив с замененными элементами.
-     * Если целевой массив меньше исходного — возвращаем исходный массив.
-     */
+    // Исправлено в связи с коррекцией ТЗ:
+    // размер выходного массива соответствует размеру массива toArray
+    // todo: проговорить кейсы применения этого метода, нифига не очевидно
     private int[] merge(int[] fromArray, int[] toArray) {
-        if (fromArray.length > toArray.length) {
-            return fromArray;
-        }
-        for (int i = 0; i < fromArray.length; i++) {
-            toArray[i] = fromArray[i];
-        }
+        System.arraycopy(fromArray, 0, toArray, 0, toArray.length);
 
         return toArray;
     }
-    // подразумевалось: есть первоначальное состояние и конечное, размер должен был соответствовать размеру конечного массива;
+
 
     public void add(int element) {
-        if (this.size >= this.array.length) {
-            this.array = expandArray(this.array);
+        if (size >= array.length) {
+            array = expandArray(array);
         }
-        this.array[this.size] = element;
-        this.size++;
+        array[size] = element;
+        size++;
     }
 
-    public void add(int[] elements) { //лучше переобозвать на addAll: если меняется логика — нужно менять именование
-        while (this.size + elements.length >= this.array.length) {
-            this.array = expandArray(this.array);
+//    public void addAll(int... elements) { - добавляет возможность записывать просто список элементов для
+//                                            добавления в массив, однако создает накладные расходы в виде массива в
+//                                            массиве, если передаем массив аргументов
+
+    public void addAll(int[] elements) {
+        while (size + elements.length >= array.length) {
+            array = expandArray(array);
         }
-        for (int i = 0; i < elements.length; i++) {
-            this.array[i + size] = elements[i];
-        }
+        System.arraycopy(elements, 0, array, size, elements.length);
         size += elements.length;
     }
 
-    public void add(int index, int value) { // лучше переобозвать на insert, put etc.
-        if (isIndexInvalid(index, this.size)) return;
-        if (this.array.length <= this.size) {
-            this.array = expandArray(this.array);
+    public void insert(int index, int value) {
+        if (isIndexInvalid(index)) {
+            System.out.printf("""
+                            Выход за пределы пользовательского массива, индекс не существует.\s
+                            ArrayIndexOutOfBoundException: Index %d out of bounds for length %d\s
+                            """,
+                    index,
+                    size);
+            return;
         }
-        int[] arrayBuffer = merge(this.array, new int[this.array.length]);
-        for (int i = index; i < arrayBuffer.length - 1; i++) {
-            this.array[i + 1] = arrayBuffer[i];
-        }
-        this.array[index] = value;
-        this.size++;
+        if (array.length <= size) array = expandArray(array);
+        System.arraycopy(array, index, array, index + 1, size - index);
+        array[index] = value;
+        size++;
     }
 
-    public void add(int index, int[] elements) { // todo перебрать все методы с чеками, принты разбивать на строки (небольно)
-        if (isIndexInvalid(index, this.size)) {
-            System.out.printf("Выход за пределы пользовательского массива, индекс не существует. \n" +
-                    "ArrayIndexOutOfBoundException: Index %d out of bounds for length %d \n",
+    public void insertAll(int index, int[] elements) {
+        if (isIndexInvalid(index)) {
+            System.out.printf("""
+                            Выход за пределы пользовательского массива, индекс не существует.\s
+                            ArrayIndexOutOfBoundException: Index %d out of bounds for length %d\s
+                            """,
                     index,
-                    this.size);
-            return; // выбрасываем текст на слое представления
+                    size);
+            return;
         }
-        int[] bufferArray = merge(this.array, new int[this.array.length]);
-        while (this.size + elements.length >= this.array.length) {
-            this.array = expandArray(this.array);
-        }
-        for (int i = 0; i < elements.length; i++) {
-            this.array[i + index] = elements[i];
-        }
-        for (int i = 0; i < this.size - index; i++) {
-            this.array[i + index + elements.length] = bufferArray[i + index];
-        }
-        this.size += elements.length;
+        while (array.length <= size + elements.length) array = expandArray(array);
+        System.arraycopy(array, index, array, index + elements.length, size - index);
+        System.arraycopy(elements, 0, array, index, elements.length);
+        size += elements.length;
     }
 
     public int length() {
-        return this.size;
+        return size;
     }
 
     public int getValue(int index) {
-        if (isIndexInvalid(index, this.size)) return -1;
-
+        if (isIndexInvalid(index)) {
+            System.out.printf("""
+                            Выход за пределы пользовательского массива, индекс не существует.\s
+                            ArrayIndexOutOfBoundException: Index %d out of bounds for length %d\s
+                            """,
+                    index,
+                    size);
+            return -1;
+        }
         return this.array[index];
     }
 
     public int[] getArray() {
-        int[] userArray = new int[this.size];
-        // IDEA предлагает заменить на System.arraycopy(array, 0, userArray, 0, size);
-        for (int i = 0; i < this.size; i++) {
-            userArray[i] = this.array[i];
-        }
+        int[] userArray = new int[size];
+        System.arraycopy(array, 0, userArray, 0, size);
 
         return userArray;
     }
 
-    public void replaceByIndex(int index, int element) {
-        if (isIndexInvalid(index, this.size)) {
+    public void replaceByIndex(int index, int value) {
+        if (isIndexInvalid(index)) {
+            System.out.printf("""
+                            Выход за пределы пользовательского массива, индекс не существует.\s
+                            ArrayIndexOutOfBoundException: Index %d out of bounds for length %d\s
+                            """,
+                    index,
+                    size);
             return;
         }
-        this.array[index] = element;
+        array[index] = value;
     }
 
     public void remove(int index) {
-        if (isIndexInvalid(index, this.size)) {
+        if (isIndexInvalid(index)) {
+            System.out.printf("""
+                            Выход за пределы пользовательского массива, индекс не существует.\s
+                            ArrayIndexOutOfBoundException: Index %d out of bounds for length %d\s
+                            """,
+                    index,
+                    size);
             return;
         }
-        int[] arrayBuffer = new int[this.array.length];
-        for (int i = 0; i < this.array.length; i++) {
-            arrayBuffer[i] = this.array[i];
-        }
-        for (int i = 0; i < this.array.length; i++) {
-            if (i >= index && i < arrayBuffer.length - 1) {
-                this.array[i] = arrayBuffer[i + 1];
-            }
-        }
-        this.size--;
+        System.arraycopy(array, index + 1, array, index, size - index - 1);
+        size--;
     }
 
-    /**
-     * Удаляет все вхождения. Можно доработать до удаления только первого, только последнего или i-го вхождения.
-     */
-    public void removeElementByValue(int value) {
-        CustomList removableArray = new CustomList(this.array);
-        //boolean isRemoved = false;
-        for (int i = 0; i < this.size; i++) {
-            if (removableArray.getValue(i) == value) {
-                removableArray.remove(i);
-                this.size--;
-                this.array = removableArray.getArray();
-                System.out.println("Совпадений в массиве не найдено.");
+    public void removeByValueOnce(int value) {
+        for (int i = 0; i < size; i++) {
+            if (array[i] == value) {
+                System.arraycopy(array, i + 1, array, i, size - i - 1);
+                size--;
                 return;
             }
         }
+        System.out.println("Совпадений в массиве не найдено.");
     }
 
-    public void removeAllOfIndex(int... indexes) { // на будущее - собрать на примитивах не взирая на сложность
-        CustomList modifiedList = new CustomList(this.array);
-        int counter = 0;
-        int flagCorrector = 0;
-        while (counter < indexes.length) {
-            modifiedList.remove(indexes[counter] - flagCorrector);
-            flagCorrector++;
-            counter++;
-            this.size--;
+    public void removeByValueAll(int value) {
+        boolean isSomethingRemoved = false;
+        for (int i = 0; i < size; i++) {
+            if (array[i] == value) {
+                System.arraycopy(array, i + 1, array, i, size - i - 1);
+                size--;
+                isSomethingRemoved = true;
+            }
         }
-        this.array = modifiedList.getArray();
+        if (!isSomethingRemoved) System.out.println("Совпадений в массиве не найдено.");
     }
 
-    public void removeAllOfValue(int[] elements) {
+    public void removeAllOfIndexList(int... indexList) {
+        for (int index : indexList) {
+            if (isIndexInvalid(index)) {
+                System.out.printf("""
+                                Выход за пределы пользовательского массива, индекс не существует.\s
+                                ArrayIndexOutOfBoundException: Index %d out of bounds for length %d\s
+                                """,
+                        index,
+                        size);
+                return;
+            }
+        }
+        for (int i = 0; i < indexList.length; i++) {
+            System.arraycopy(array, indexList[i] + 1, array, indexList[i], size - indexList[i] - i - 1);
+        }
+        size -= indexList.length;
+    }
+
+    public void removeAllOfValueList(int[] valueList) {
         CustomList list = new CustomList(this.array);
         int coincidenceCounter = 0;
         int cursor = 0;
         for (int i = 0; i < list.length(); i++) {
-            if (list.getValue(i) == elements[0]) {
+            if (list.getValue(i) == valueList[0]) {
                 cursor = i;
-                for (int element : elements) {
+                for (int element : valueList) {
                     if (list.getValue(cursor) == element) {
                         coincidenceCounter++;
                         cursor++;
                     }
                 }
             }
-            if (coincidenceCounter != elements.length) {
+            if (coincidenceCounter != valueList.length) {
                 cursor = 0;
             } else {
                 while (cursor > i) {
@@ -245,8 +233,8 @@ public class CustomList {
         this.array = list.getArray();
     }
 
-    private boolean isIndexInvalid(int index, int arrayLength) { // isIndexValid — переименовать, правило хорошего тона
-        return index > arrayLength - 1 || index < 0;
+    private boolean isIndexInvalid(int index) {
+        return index > size - 1 || index < 0;
     }
 
 
@@ -268,8 +256,8 @@ public class CustomList {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("[");
-        for (int i = 0; i < this.size; i++) {
-            if (i < this.size - 1) {
+        for (int i = 0; i < size; i++) {
+            if (i < size - 1) {
                 sb.append(array[i]).append(", ");
             } else {
                 sb.append(array[i]).append("]");
