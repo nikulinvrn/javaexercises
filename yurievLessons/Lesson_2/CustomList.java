@@ -26,8 +26,12 @@ import java.util.Objects;
 
 public class CustomList {
     private static final int DEFAULT_ARRAY_CAPACITY = 10;
+
     private int[] array;
     private int size;
+
+
+
 
     public CustomList() {
         this.array = new int[DEFAULT_ARRAY_CAPACITY];
@@ -44,12 +48,8 @@ public class CustomList {
         this.array = array;
     }
 
-    private int[] expandArray(int[] array) {
-        int[] expandedArray = new int[array.length + array.length / 2];
-        System.arraycopy(array, 0, expandedArray, 0, array.length);
 
-        return expandedArray;
-    }
+
 
     // Исправлено в связи с коррекцией ТЗ:
     // размер выходного массива соответствует размеру массива toArray
@@ -59,7 +59,6 @@ public class CustomList {
 
         return toArray;
     }
-
 
     public void add(int element) {
         if (size >= array.length) {
@@ -72,7 +71,6 @@ public class CustomList {
 //    public void addAll(int... elements) { - добавляет возможность записывать просто список элементов для
 //                                            добавления в массив, однако создает накладные расходы в виде массива в
 //                                            массиве, если передаем массив аргументов
-
     public void addAll(int[] elements) {
         while (size + elements.length >= array.length) {
             array = expandArray(array);
@@ -107,7 +105,9 @@ public class CustomList {
                     size);
             return;
         }
-        while (array.length <= size + elements.length) array = expandArray(array);
+        while (array.length <= size + elements.length) {
+            array = expandArray(array);
+        }
         System.arraycopy(array, index, array, index + elements.length, size - index);
         System.arraycopy(elements, 0, array, index, elements.length);
         size += elements.length;
@@ -117,6 +117,10 @@ public class CustomList {
         return size;
     }
 
+    //todo: выяснить "эксепшен — это же норма!" — нужно ли генерировать свой, если есть готовый?
+    //      в целом, можно возвращать null, но это все равно в итоге где-то выдаст NPE.
+    //      Получается, что проверка if-ом ничего не дает в рамках данного метода:
+    //      исключение всё равно вылетает и оно понимаемо без «перевода».
     public int getValue(int index) {
         if (isIndexInvalid(index)) {
             System.out.printf("""
@@ -125,7 +129,6 @@ public class CustomList {
                             """,
                     index,
                     size);
-            return -1;
         }
         return array[index];
     }
@@ -206,14 +209,13 @@ public class CustomList {
     }
 
     public void removeAllOfValueList(int[] valueList) {
-        CustomList list = new CustomList(array);
         int coincidenceCounter = 0;
         int cursor = 0;
-        for (int i = 0; i < list.length(); i++) {
-            if (list.getValue(i) == valueList[0]) {
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] == valueList[0]) {
                 cursor = i;
                 for (int element : valueList) {
-                    if (list.getValue(cursor) == element) {
+                    if (array[cursor] == element) {
                         coincidenceCounter++;
                         cursor++;
                     }
@@ -222,20 +224,28 @@ public class CustomList {
             if (coincidenceCounter != valueList.length) {
                 cursor = 0;
             } else {
-                while (cursor > i) {
-                    list.remove(cursor - 1);
-                    size--;
-                    cursor--;
-                }
+                System.arraycopy(array, cursor, array, cursor - valueList.length, size - i - valueList.length);
                 coincidenceCounter = 0;
+                size -= valueList.length;
             }
         }
-        array = list.getArray();
+    }
+
+
+
+
+    private int[] expandArray(int[] array) {
+        int[] expandedArray = new int[array.length + array.length / 2];
+        System.arraycopy(array, 0, expandedArray, 0, array.length);
+
+        return expandedArray;
     }
 
     private boolean isIndexInvalid(int index) {
         return index > size - 1 || index < 0;
     }
+
+
 
 
     @Override

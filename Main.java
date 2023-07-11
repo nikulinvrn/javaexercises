@@ -25,7 +25,8 @@ public class Main {
         System.out.println(list);
         list.removeByValueOnce(33);
         System.out.println(list);
-        list.removeAllOfValueList(new int[]{2, 3});
+
+        list.removeAllOfValueList(new int[]{7, 8});
         list.removeByValueAll(9);
         System.out.println(list);
         list.removeAllOfIndexList(3, 4);
@@ -35,5 +36,8 @@ public class Main {
         list.replaceByIndex(0, 1001);
         System.out.println(list);
         System.out.println("Длина массива: " + list.length());
+
+
+        System.out.println(list.getValue(10001));
     }
 }
