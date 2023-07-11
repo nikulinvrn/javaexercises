@@ -130,7 +130,8 @@ public class CustomList {
                     index,
                     size);
         }
-        return array[index];
+        int response = array[index];
+        return response;
     }
 
     public int[] getArray() {
