@@ -24,18 +24,21 @@
 
 package LeetCode;
 
+import java.util.HashMap;
+
 public class ValidParentheses {
     public static void main(String[] args) {
         System.out.println(testLC());
     }
 
     private static boolean validParentheses(String s) {
-        int roundBracketsCounter = 0;
-        int squareBracketsCounter = 0;
-        int curlyBracesCounter = 0;
+        HashMap<Character, Character> parantheses = new HashMap<>();
+        char[] inputString = s.toCharArray();
+        parantheses.put(')','(');
+        parantheses.put('{','}');
+        parantheses.put('[',']');
 
-
-
+        System.out.println(parantheses);
 
         return false;
     }

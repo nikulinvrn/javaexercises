@@ -81,12 +81,8 @@ public class CustomList {
 
     public void insert(int index, int value) {
         if (isIndexInvalid(index)) {
-            System.out.printf("""
-                            Выход за пределы пользовательского массива, индекс не существует.\s
-                            ArrayIndexOutOfBoundException: Index %d out of bounds for length %d\s
-                            """,
-                    index,
-                    size);
+            System.out.printf("Выход за пределы пользовательского массива, индекс не существует. \n" +
+                              "ArrayIndexOutOfBoundException: Index %d out of bounds for length %d \n", index, size);
             return;
         }
         if (array.length <= size) array = expandArray(array);
@@ -97,12 +93,8 @@ public class CustomList {
 
     public void insertAll(int index, int[] elements) {
         if (isIndexInvalid(index)) {
-            System.out.printf("""
-                            Выход за пределы пользовательского массива, индекс не существует.\s
-                            ArrayIndexOutOfBoundException: Index %d out of bounds for length %d\s
-                            """,
-                    index,
-                    size);
+            System.out.printf("Выход за пределы пользовательского массива, индекс не существует. \n" +
+                              "ArrayIndexOutOfBoundException: Index %d out of bounds for length %d \n", index, size);
             return;
         }
         while (array.length <= size + elements.length) {
@@ -123,12 +115,8 @@ public class CustomList {
     //      исключение всё равно вылетает и оно понимаемо без «перевода».
     public int getValue(int index) {
         if (isIndexInvalid(index)) {
-            System.out.printf("""
-                            Выход за пределы пользовательского массива, индекс не существует.\s
-                            ArrayIndexOutOfBoundException: Index %d out of bounds for length %d\s
-                            """,
-                    index,
-                    size);
+            System.out.printf("Выход за пределы пользовательского массива, индекс не существует. \n" +
+                              "ArrayIndexOutOfBoundException: Index %d out of bounds for length %d \n", index, size);
         }
         return array[index];
     }
@@ -142,12 +130,8 @@ public class CustomList {
 
     public void replaceByIndex(int index, int value) {
         if (isIndexInvalid(index)) {
-            System.out.printf("""
-                            Выход за пределы пользовательского массива, индекс не существует.\s
-                            ArrayIndexOutOfBoundException: Index %d out of bounds for length %d\s
-                            """,
-                    index,
-                    size);
+            System.out.printf("Выход за пределы пользовательского массива, индекс не существует. \n" +
+                              "ArrayIndexOutOfBoundException: Index %d out of bounds for length %d \n", index, size);
             return;
         }
         array[index] = value;
@@ -155,12 +139,8 @@ public class CustomList {
 
     public void remove(int index) {
         if (isIndexInvalid(index)) {
-            System.out.printf("""
-                            Выход за пределы пользовательского массива, индекс не существует.\s
-                            ArrayIndexOutOfBoundException: Index %d out of bounds for length %d\s
-                            """,
-                    index,
-                    size);
+            System.out.printf("Выход за пределы пользовательского массива, индекс не существует. \n" +
+                              "ArrayIndexOutOfBoundException: Index %d out of bounds for length %d \n", index, size);
             return;
         }
         System.arraycopy(array, index + 1, array, index, size - index - 1);
@@ -193,12 +173,8 @@ public class CustomList {
     public void removeAllOfIndexList(int... indexList) {
         for (int index : indexList) {
             if (isIndexInvalid(index)) {
-                System.out.printf("""
-                                Выход за пределы пользовательского массива, индекс не существует.\s
-                                ArrayIndexOutOfBoundException: Index %d out of bounds for length %d\s
-                                """,
-                        index,
-                        size);
+                System.out.printf("Выход за пределы пользовательского массива, индекс не существует. \n" +
+                                  "ArrayIndexOutOfBoundException: Index %d out of bounds for length %d \n", index, size);
                 return;
             }
         }
@@ -246,12 +222,14 @@ public class CustomList {
     }
 
 
-
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof CustomList that)) return false; // что за that?
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CustomList that = (CustomList) o;
+
+        //return Arrays.equals(array, that.array);
         return length() == that.length() && Arrays.equals(getArray(), that.getArray());
     }
 
@@ -261,7 +239,6 @@ public class CustomList {
         result = 31 * result + Arrays.hashCode(getArray());
         return result;
     }
-
 
     @Override
     public String toString() {
