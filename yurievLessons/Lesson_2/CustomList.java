@@ -167,7 +167,9 @@ public class CustomList {
                 isSomethingRemoved = true;
             }
         }
-        if (!isSomethingRemoved) System.out.println("Совпадений в массиве не найдено.");
+        if (!isSomethingRemoved) {
+            System.out.println("Совпадений в массиве не найдено.");
+        }
     }
 
     public void removeAllOfIndexList(int... indexList) {
@@ -222,6 +224,8 @@ public class CustomList {
     }
 
 
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -229,7 +233,6 @@ public class CustomList {
 
         CustomList that = (CustomList) o;
 
-        //return Arrays.equals(array, that.array);
         return length() == that.length() && Arrays.equals(getArray(), that.getArray());
     }
 
@@ -239,6 +242,7 @@ public class CustomList {
         result = 31 * result + Arrays.hashCode(getArray());
         return result;
     }
+
 
     @Override
     public String toString() {

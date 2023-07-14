@@ -38,6 +38,7 @@ public class ValidParentheses {
         parantheses.put('{','}');
         parantheses.put('[',']');
 
+        // чую, нужен аналог стека...
         System.out.println(parantheses);
 
         return false;
