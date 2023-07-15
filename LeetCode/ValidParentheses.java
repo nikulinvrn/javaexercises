@@ -24,27 +24,59 @@
 
 package LeetCode;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ValidParentheses {
     public static void main(String[] args) {
-        System.out.println(testLC());
+
+        System.out.println(testOfValidParentheses());
+
     }
 
     private static boolean validParentheses(String s) {
-        HashMap<Character, Character> parantheses = new HashMap<>();
-        char[] inputString = s.toCharArray();
-        parantheses.put(')','(');
-        parantheses.put('{','}');
-        parantheses.put('[',']');
+        HashMap<Character, Character> parentheses = new HashMap<>();
+        ArrayList<Character> parenthesesStack = new ArrayList<>();
+        parentheses.put(')', '(');
+        parentheses.put('}', '{');
+        parentheses.put(']', '[');
+        parentheses.put('>', '<'); // немного отсебятины
 
-        System.out.println(parantheses);
+        for (int i = 0; i < s.toCharArray().length; i++) {
+            if (parentheses.containsValue(s.toCharArray()[i])) {
+                parenthesesStack.add(s.toCharArray()[i]);
+            }
+            if (parentheses.containsKey(s.toCharArray()[i])) {
+                if (!parenthesesStack.isEmpty() &&
+                        parenthesesStack.get(parenthesesStack.toArray().length - 1)
+                                == parentheses.get(s.toCharArray()[i])) {
+                    parenthesesStack.remove(parenthesesStack.toArray().length - 1);
+                } else {
+                    return false;
+                }
+            }
+        }
 
-        return false;
+        return parenthesesStack.isEmpty();
     }
 
-    private static boolean[] testLC() {
+    private static StringBuilder testOfValidParentheses() {
+        StringBuilder sb = new StringBuilder("Результаты тестов: \n");
+        sb.append("() : ");
+        sb.append(validParentheses("()")).append("\n");
+        sb.append("()[]{} : ");
+        sb.append(validParentheses("()[]{}")).append("\n");
+        sb.append("(] : ");
+        sb.append(validParentheses("(]")).append("\n");
+        sb.append("[(]) : ");
+        sb.append(validParentheses("[(])")).append("\n");
+        sb.append("[(])> : ");
+        sb.append(validParentheses("[(])>")).append("\n");
+        sb.append("([{}])> : ");
+        sb.append(validParentheses("([{}])>")).append("\n");
+        sb.append("<(Текст не помеха[ - {c текстом также работает}])>. : ");
+        sb.append(validParentheses("<(Текст не помеха[ - {c текстом также работает}])>.")).append("\n");
 
-            return new boolean[]{validParentheses("()"), validParentheses("()[]{}"), validParentheses("(]")};
+        return sb;
     }
 }
