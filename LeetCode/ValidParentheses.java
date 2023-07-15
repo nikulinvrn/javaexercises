@@ -28,23 +28,38 @@ import java.util.HashMap;
 
 public class ValidParentheses {
     public static void main(String[] args) {
+
         System.out.println(testLC());
+
     }
 
     private static boolean validParentheses(String s) {
         HashMap<Character, Character> parantheses = new HashMap<>();
         char[] inputString = s.toCharArray();
-        parantheses.put(')','(');
-        parantheses.put('{','}');
-        parantheses.put('[',']');
+        parantheses.put(')', '(');
+        parantheses.put('{', '}');
+        parantheses.put('[', ']');
 
-        System.out.println(parantheses);
+        for (char ch : inputString) {
+            if (parantheses.containsKey(ch)){
+                for (int i = inputString.length - 1; i >= 0; i--) {
+                    if(inputString[i] == parantheses.get(ch)) {
+                        return true;
+                    }
+                }
+            }
+        }
 
         return false;
     }
 
-    private static boolean[] testLC() {
+    private static StringBuilder testLC() {
+        StringBuilder sb = new StringBuilder("Результаты тестов: \n");
+        sb.append(validParentheses("()")).append("\n");
+        sb.append(validParentheses("()[]{}")).append("\n");
+        sb.append(validParentheses("(]")).append("\n");
+        sb.append(validParentheses("[(])")).append("\n");
 
-            return new boolean[]{validParentheses("()"), validParentheses("()[]{}"), validParentheses("(]")};
+        return sb;
     }
 }
