@@ -30,5 +30,50 @@ package LeetCode;
  *      1 <= n <= 2^31 - 1
  *
  */
+
+
 public class HappyNumber {
+    public static void main(String[] args) {
+        System.out.println(isHappy(19));
+        System.out.println(isHappy(2));
+    }
+
+    public static boolean isHappy(int n) {
+        int lastNumber = n;
+        int marker = n;
+        while (true) {
+            lastNumber = sumQrtOfDigits(lastNumber);
+            marker = sumQrtOfDigits(sumQrtOfDigits(marker));
+
+            if (lastNumber == 1 || marker == 1) {
+                return true;
+            } else if (lastNumber >= (2147483647) || lastNumber == marker) {
+                return false;
+            }
+        }
+    }
+
+    private static int[] splitNuberToDigits(int number) {
+        int[] arrayOfDigits = new int[10];
+
+        int i = 0;
+        while (number > 0) {
+            arrayOfDigits[i] = number % 10;
+            number = number / 10;
+            i++;
+        }
+
+        return arrayOfDigits;
+    }
+
+    private static int sumQrtOfDigits(int num) {
+        int sumOfQrt = 0;
+        int[] arrayOfDigit = splitNuberToDigits(num);
+
+        for (int x : arrayOfDigit) {
+            sumOfQrt += x * x;
+        }
+
+        return sumOfQrt;
+    }
 }
