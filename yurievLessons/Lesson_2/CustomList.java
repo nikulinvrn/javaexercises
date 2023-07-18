@@ -51,9 +51,6 @@ public class CustomList {
 
 
 
-    // Исправлено в связи с коррекцией ТЗ:
-    // размер выходного массива соответствует размеру массива toArray
-    // todo: проговорить кейсы применения этого метода, нифига не очевидно
     private int[] merge(int[] fromArray, int[] toArray) {
         System.arraycopy(fromArray, 0, toArray, 0, toArray.length);
 
@@ -109,15 +106,12 @@ public class CustomList {
         return size;
     }
 
-    //todo: выяснить "эксепшен — это же норма!" — нужно ли генерировать свой, если есть готовый?
-    //      в целом, можно возвращать null, но это все равно в итоге где-то выдаст NPE.
-    //      Получается, что проверка if-ом ничего не дает в рамках данного метода:
-    //      исключение всё равно вылетает и оно понимаемо без «перевода».
     public int getValue(int index) {
         if (isIndexInvalid(index)) {
             System.out.printf("Выход за пределы пользовательского массива, индекс не существует. \n" +
                               "ArrayIndexOutOfBoundException: Index %d out of bounds for length %d \n", index, size);
         }
+
         return array[index];
     }
 

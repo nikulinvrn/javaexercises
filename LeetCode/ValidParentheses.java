@@ -34,7 +34,7 @@ public class ValidParentheses {
 
     }
 
-    private static boolean validParentheses(String s) {
+    private static boolean validParentheses(String inputString) {
         HashMap<Character, Character> parentheses = new HashMap<>();
         ArrayList<Character> parenthesesStack = new ArrayList<>();
         parentheses.put(')', '(');
@@ -42,14 +42,14 @@ public class ValidParentheses {
         parentheses.put(']', '[');
         parentheses.put('>', '<'); // немного отсебятины
 
-        for (int i = 0; i < s.toCharArray().length; i++) {
-            if (parentheses.containsValue(s.toCharArray()[i])) {
-                parenthesesStack.add(s.toCharArray()[i]);
+        for (int i = 0; i < inputString.toCharArray().length; i++) {
+            if (parentheses.containsValue(inputString.toCharArray()[i])) {
+                parenthesesStack.add(inputString.toCharArray()[i]);
             }
-            if (parentheses.containsKey(s.toCharArray()[i])) {
+            if (parentheses.containsKey(inputString.toCharArray()[i])) {
                 if (!parenthesesStack.isEmpty() &&
                         parenthesesStack.get(parenthesesStack.toArray().length - 1)
-                                == parentheses.get(s.toCharArray()[i])) {
+                                == parentheses.get(inputString.toCharArray()[i])) {
                     parenthesesStack.remove(parenthesesStack.toArray().length - 1);
                 } else {
                     return false;

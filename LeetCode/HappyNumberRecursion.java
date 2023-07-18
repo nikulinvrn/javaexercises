@@ -29,30 +29,36 @@
  *
  */
 
+// Очень плохая идея — записать в файл все счастливые числа в пределах 0...Integer.MAX_VALUE.
+// Когда файл перевалил за 1 Gb эксперимент было решено остановить и просто найти
+// колличество таких чисел. Count happy numbers: 312337045
 
 package LeetCode;
 
-public class HappyNumber {
+public class HappyNumberRecursion {
     public static void main(String[] args) {
         System.out.println(isHappy(19));
         System.out.println(isHappy(2));
-        System.out.println(isHappy(2342346));
-        // Count happy numbers: 312337045
     }
 
     public static boolean isHappy(int n) {
-        int lastNumber = n;
-        int marker = n;
-        while (true) {
-            lastNumber = sumQrtOfDigits(lastNumber);
-            marker = sumQrtOfDigits(sumQrtOfDigits(marker));
+        int inputNumber = n;
+        int cycleMarker = n;
 
-            if (lastNumber == 1 || marker == 1) {
-                return true;
-            } else if (lastNumber >= Integer.MAX_VALUE || lastNumber == marker) {
-                return false;
-            }
+        return StepOfRecursion(inputNumber, cycleMarker);
+    }
+
+    public static boolean StepOfRecursion(int lastNumberOfStep, int fasterNumberOfStep){
+        lastNumberOfStep = sumQrtOfDigits(lastNumberOfStep);
+        fasterNumberOfStep = sumQrtOfDigits(sumQrtOfDigits(fasterNumberOfStep));
+
+        if (lastNumberOfStep == 1 || fasterNumberOfStep == 1) {
+            return true;
+        } else if (lastNumberOfStep >= Integer.MAX_VALUE || lastNumberOfStep == fasterNumberOfStep) {
+            return false;
         }
+
+        return StepOfRecursion(lastNumberOfStep, fasterNumberOfStep);
     }
 
     private static int[] splitNumberToDigits(int number) {
@@ -70,12 +76,12 @@ public class HappyNumber {
 
     private static int sumQrtOfDigits(int num) {
         int sumOfQrt = 0;
-        int[] arrayOfDigit = splitNumberToDigits(num);
 
-        for (int x : arrayOfDigit) {
+        for (int x : splitNumberToDigits(num)) {
             sumOfQrt += x * x;
         }
 
         return sumOfQrt;
     }
 }
+
