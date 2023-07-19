@@ -1,6 +1,8 @@
 package yurievLessons.Lesson_3;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class CustomMap<K, V> {
     final int DEFAULT_CAPACITY = 16;
@@ -181,8 +183,48 @@ public class CustomMap<K, V> {
         return false;
     }
 
-    // TODO: Set keySet(): возвращает коллекцию ключей
-    // TODO: Set valueSet(): возвращает коллекцию значений из нод
+    /**
+     * Возвращает коллекцию ключей
+     * @return Set keySet
+     */
+    public Set keySet(){
+        Set keys = new HashSet();
+
+        for (int i = 0; i < table.length; i++) {
+            Node<K, V> thisNode = table[i];
+            if (thisNode == null) {
+                continue;
+            }
+            while (thisNode != null) {
+                keys.add(thisNode.getKey());
+                thisNode = thisNode.getNext();
+            }
+        }
+
+        return keys;
+    }
+
+    /**
+     * Возвращает коллекцию значений из нод
+     * @return Set valuesSet
+     */
+    public Set valueSet(){
+        Set values = new HashSet();
+
+        for (int i = 0; i < table.length; i++) {
+            Node<K, V> thisNode = table[i];
+            if (thisNode == null) {
+                continue;
+            }
+            while (thisNode != null) {
+                values.add(thisNode.getValue());
+                thisNode = thisNode.getNext();
+            }
+        }
+
+        return values;
+    }
+
 
     /* ----------------  «UPDATE» OPERATIONS -------------- */
 
