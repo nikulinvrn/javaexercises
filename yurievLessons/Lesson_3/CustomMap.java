@@ -65,13 +65,14 @@ public class CustomMap<K, V> {
     /**
      * Метод добавляет в мапу, на которой вызван, все элементы из мапы, которая передается ему в качестве параметра.
      * Добавление происходит согласно логике метода {@link CustomMap#put}.
+     *
      * @param inputMap мапа, которую будем помещать в ту мапу, на которой вызван метод
      * @return true если добавление успешно, false если добавление не произошло
      */
     public boolean putAll(CustomMap<K, V> inputMap) {
         int countModification = 0;
         for (int i = 0; i < inputMap.table.length; i++) {
-            Node<K,V> thisNode = inputMap.table[i];
+            Node<K, V> thisNode = inputMap.table[i];
             while (thisNode != null) {
                 this.put(thisNode.getKey(), thisNode.getValue());
                 thisNode = thisNode.getNext();
@@ -95,7 +96,7 @@ public class CustomMap<K, V> {
     /**
      * @return true если мапа пустая (null или size = 0), false в любом ином случае
      */
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         return (this == null || this.size() == 0) ? true : false;
     }
 
@@ -117,6 +118,7 @@ public class CustomMap<K, V> {
                 temp = temp.getNext();
             }
         }
+
         return null;
     }
 
@@ -130,16 +132,17 @@ public class CustomMap<K, V> {
     /**
      * Метод затирает мапу до значения null
      */
-    public void clear(){
+    public void clear() {
         this.table = null;
     }
 
     /**
      * Метод удаляет пару "ключ : значение" по ключу
+     *
      * @param key ключ, по которому ищем пару
      * @return true если удаление прошло успешно, false в любом ином случае
      */
-    public boolean removeByKey(K key){
+    public boolean removeByKey(K key) {
         int hash = key.hashCode();
         for (int i = 0; i < table.length; i++) {
             Node<K, V> thisNode = table[i];
@@ -150,7 +153,7 @@ public class CustomMap<K, V> {
             }
             while (thisNode != null) {
                 if (thisNode.getKey().hashCode() == hash) {
-                    if(prevNode != null){
+                    if (prevNode != null) {
                         prevNode.setNext(thisNode.getNext());
                         return true;
                     } else if (prevNode == null) {
@@ -165,8 +168,66 @@ public class CustomMap<K, V> {
         return false;
     }
 
+    /**
+     * Метод удаляет ноду с первым обнаруженным вхождением значения
+     * @param value значение, по которому отбирается нода на удаление
+     * @return true если удаление завершено успешно, false в ином случае
+     */
+    public boolean removeByValue(V value) { // TODO: обдумать вариант с удалить последнее вхождение
+        for (int i = 0; i < table.length; i++) {
+            Node<K, V> thisNode = table[i];
+            Node<K, V> prevNode = null;
+            if (thisNode == null) {
+                continue;
+            }
+            while (thisNode != null) {
+                if (thisNode.getValue().equals(value)) {
+                    if (prevNode != null) {
+                        prevNode.setNext(thisNode.getNext());
+                            return true;
+                    } else if (prevNode == null) {
+                        table[i] = table[i].getNext();
+                            return true;
+                    }
+                }
+                prevNode = thisNode;
+                thisNode = thisNode.getNext();
+            }
+        }
 
+        return false;
+    }
 
+    /**
+     * Метод удаляет ноды с соотсветсвующим значением
+     * @param value значение, по которому отбираются ноды на удаление
+     * @return true если удаление завершено успешно один и более раз, false в ином случае
+     */
+    public boolean removeAllByValue(V value) {
+        int countRemoved = 0;
+        for (int i = 0; i < table.length; i++) {
+            Node<K, V> thisNode = table[i];
+            Node<K, V> prevNode = null;
+            if (thisNode == null) {
+                continue;
+            }
+            while (thisNode != null) {
+                if (thisNode.getValue().equals(value)) {
+                    if (prevNode != null) {
+                        prevNode.setNext(thisNode.getNext());
+                        countRemoved++;
+                    } else if (prevNode == null) {
+                        table[i] = table[i].getNext();
+                        countRemoved++;
+                    }
+                }
+                prevNode = thisNode;
+                thisNode = thisNode.getNext();
+            }
+        }
+
+        return (countRemoved > 0) ? true : false;
+    }
 
 
     @Override
