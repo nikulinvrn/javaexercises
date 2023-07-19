@@ -83,6 +83,8 @@ public class CustomMap<K, V> {
         return (countModification > 0) ? true : false;
     }
 
+    // TODO: putIfAbsent(K k, V v): помещает в коллекцию новый объект с ключом k и значением v,
+    //       если в коллекции еще нет элемента с подобным ключом.
 
     /* ----------------  «RETRIEVE» OPERATIONS -------------- */
 
@@ -122,6 +124,53 @@ public class CustomMap<K, V> {
         return null;
     }
 
+    /**
+     * Метод проверяет на существование ноды в таблице с ключом key
+     * @param key ключ, по которому проверяем существование ноды
+     * @return true если нода по ключу найдена, false в ином случае
+     */
+    public boolean containsKey(K key){
+        int hash = key.hashCode();
+        for (int i = 0; i < table.length; i++) {
+            Node<K, V> thisNode = table[i];
+            if (thisNode == null) {
+                continue;
+            }
+            while (thisNode != null) {
+                if (thisNode.getKey().hashCode() == hash) {
+                    return true;
+                }
+                thisNode = thisNode.getNext();
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Метод проверяет на существование ноды в таблице со значением value
+     * @param value значение, по которому проверяем существование ноды
+     * @return true если нода по ключу найдена, false в ином случае
+     */
+    public boolean containsValue(V value){
+        for (int i = 0; i < table.length; i++) {
+            Node<K, V> thisNode = table[i];
+            if (thisNode == null) {
+                continue;
+            }
+            while (thisNode != null) {
+                if (thisNode.getValue().equals(value)) {
+                    return true;
+                }
+                thisNode = thisNode.getNext();
+            }
+        }
+
+        return false;
+    }
+
+    // TODO: Set keySet(): возвращает коллекцию ключей
+    // TODO: Set valueSet(): возвращает коллекцию значений из нод
 
     /* ----------------  «UPDATE» OPERATIONS -------------- */
 
@@ -165,6 +214,7 @@ public class CustomMap<K, V> {
                 thisNode = thisNode.getNext();
             }
         }
+
         return false;
     }
 
