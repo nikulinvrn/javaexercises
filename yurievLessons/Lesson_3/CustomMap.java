@@ -29,7 +29,8 @@ public class CustomMap<K, V> {
      */
     public boolean put(K key, V value) {
         int hash = key.hashCode();
-        int index = hash & (DEFAULT_CAPACITY - 1);
+        int index = 2;
+//        int index = hash & (DEFAULT_CAPACITY - 1);
         if (table == null) {
             table = new Node[DEFAULT_CAPACITY];
         }
@@ -61,9 +62,24 @@ public class CustomMap<K, V> {
         return false;
     }
 
+    /**
+     * Метод добавляет в мапу, на которой вызван все элементы из мапы, которая передается ему в качестве параметра.
+     * Добавление происходит согласно логике метода {@link CustomMap#put}.
+     * @param inputMap мапа, которую будем помещать в ту мапу, на которой вызван метод
+     * @return true если добавление успешно, false если добавление не произошло
+     */
     public boolean putAll(CustomMap<K, V> inputMap) {
-        // TODO: реализовать итератор для CustomMap или найти иной способ перебрать все элементы входящей мапы
-    return false;
+        int countModification = 0;
+        for (int i = 0; i < inputMap.table.length; i++) {
+            Node<K,V> thisNode = inputMap.table[i];
+            while (thisNode != null) {
+                this.put(thisNode.getKey(), thisNode.getValue());
+                thisNode = thisNode.getNext();
+                countModification++;
+            }
+        }
+
+        return (countModification > 0) ? true : false;
     }
 
 
@@ -158,13 +174,14 @@ public class CustomMap<K, V> {
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
-            if (!(o instanceof Node<?, ?> node)) return false;
-            return hash == node.hash && Objects.equals(getKey(), node.getKey()) && Objects.equals(getValue(), node.getValue());
+            if (o == null || getClass() != o.getClass()) return false;
+            Node<?, ?> node = (Node<?, ?>) o;
+            return hash == node.hash && Objects.equals(key, node.key) && Objects.equals(value, node.value) && Objects.equals(next, node.next);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(getKey());
+            return Objects.hash(hash, key, value);
         }
     }
 }
