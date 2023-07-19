@@ -127,6 +127,47 @@ public class CustomMap<K, V> {
 
     /* ----------------  «DELETE» OPERATIONS -------------- */
 
+    /**
+     * Метод затирает мапу до значения null
+     */
+    public void clear(){
+        this.table = null;
+    }
+
+    /**
+     * Метод удаляет пару "ключ : значение" по ключу
+     * @param key ключ, по которому ищем пару
+     * @return true если удаление прошло успешно, false в любом ином случае
+     */
+    public boolean removeByKey(K key){
+        int hash = key.hashCode();
+        for (int i = 0; i < table.length; i++) {
+            Node<K, V> thisNode = table[i];
+            Node<K, V> prevNode = null;
+
+            if (thisNode == null) {
+                continue;
+            }
+            while (thisNode != null) {
+                if (thisNode.getKey().hashCode() == hash) {
+                    if(prevNode != null){
+                        prevNode.setNext(thisNode.getNext());
+                        return true;
+                    } else if (prevNode == null) {
+                        table[i] = table[i].getNext();
+                        return true;
+                    }
+                }
+                prevNode = thisNode;
+                thisNode = thisNode.getNext();
+            }
+        }
+        return false;
+    }
+
+
+
+
 
     @Override
     public String toString() {
