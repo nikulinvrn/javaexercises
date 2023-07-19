@@ -29,8 +29,7 @@ public class CustomMap<K, V> {
      */
     public boolean put(K key, V value) {
         int hash = key.hashCode();
-        int index = 2;
-//        int index = hash & (DEFAULT_CAPACITY - 1);
+        int index = hash & (DEFAULT_CAPACITY - 1);
         if (table == null) {
             table = new Node[DEFAULT_CAPACITY];
         }
@@ -83,8 +82,21 @@ public class CustomMap<K, V> {
         return (countModification > 0) ? true : false;
     }
 
-    // TODO: putIfAbsent(K k, V v): помещает в коллекцию новый объект с ключом k и значением v,
-    //       если в коллекции еще нет элемента с подобным ключом.
+    /**
+     * Помещает в коллекцию новый объект с ключом key и значением value,
+     * если в коллекции еще нет элемента с подобным ключом.
+     * @param key ключ
+     * @param value значение
+     * @return true если добавление состоялось, false в ином случае
+     */
+    public boolean putIfAbsent(K key, V value) {
+        if(!this.containsKey(key)){
+            this.put(key, value);
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /* ----------------  «RETRIEVE» OPERATIONS -------------- */
 
@@ -279,6 +291,7 @@ public class CustomMap<K, V> {
         return (countRemoved > 0) ? true : false;
     }
 
+    // TODO: переопределить equals() и hashCode() для CustomMap
 
     @Override
     public String toString() {
@@ -291,7 +304,7 @@ public class CustomMap<K, V> {
                     sb.append(thisNodeInIndex);
                     thisNodeInIndex = thisNodeInIndex.getNext();
                 }
-                sb.append("}");
+                sb.append("}\n");
             }
         }
         return sb.toString();
