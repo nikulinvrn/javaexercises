@@ -1,14 +1,17 @@
 package yurievLessons.Lesson_3;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 
-public class CustomMap<K, V> {
+public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
     final int DEFAULT_CAPACITY = 16;
 
     private Node<K, V>[] table;
 
+    //на случай реализации авторесайза индексной таблицы
+    private int currentCapacity = DEFAULT_CAPACITY;
     private int size;
 
     /**
@@ -31,9 +34,9 @@ public class CustomMap<K, V> {
      */
     public boolean put(K key, V value) {
         int hash = key.hashCode();
-        int index = hash & (DEFAULT_CAPACITY - 1);
+        int index = hash & (currentCapacity - 1);
         if (table == null) {
-            table = new Node[DEFAULT_CAPACITY];
+            table = new Node[currentCapacity];
         }
         Node<K, V> thisNode = table[index];
         Node<K, V> prevNode = null;
@@ -59,7 +62,7 @@ public class CustomMap<K, V> {
                 thisNode = thisNode.getNext();
             }
         } // TODO: реализовать сортировку. Сортировку проводить после добавления элемента.
-          //       После сортировки реализовать метод бинарного поиска требуемой ноды.
+        //       После сортировки реализовать метод бинарного поиска требуемой ноды.
 
         return false;
     }
@@ -88,12 +91,13 @@ public class CustomMap<K, V> {
     /**
      * Помещает в коллекцию новый объект с ключом key и значением value,
      * если в коллекции еще нет элемента с подобным ключом.
-     * @param key ключ
+     *
+     * @param key   ключ
      * @param value значение
      * @return true если добавление состоялось, false в ином случае
      */
     public boolean putIfAbsent(K key, V value) {
-        if(!this.containsKey(key)){
+        if (!this.containsKey(key)) {
             this.put(key, value);
             return true;
         } else {
@@ -141,10 +145,11 @@ public class CustomMap<K, V> {
 
     /**
      * Метод проверяет на существование ноды в таблице с ключом key
+     *
      * @param key ключ, по которому проверяем существование ноды
      * @return true если нода по ключу найдена, false в ином случае
      */
-    public boolean containsKey(K key){
+    public boolean containsKey(K key) {
         int hash = key.hashCode();
         for (int i = 0; i < table.length; i++) {
             Node<K, V> thisNode = table[i];
@@ -164,10 +169,11 @@ public class CustomMap<K, V> {
 
     /**
      * Метод проверяет на существование ноды в таблице со значением value
+     *
      * @param value значение, по которому проверяем существование ноды
      * @return true если нода по ключу найдена, false в ином случае
      */
-    public boolean containsValue(V value){
+    public boolean containsValue(V value) {
         for (int i = 0; i < table.length; i++) {
             Node<K, V> thisNode = table[i];
             if (thisNode == null) {
@@ -186,9 +192,10 @@ public class CustomMap<K, V> {
 
     /**
      * Возвращает коллекцию ключей
+     *
      * @return Set keySet
      */
-    public Set keySet(){
+    public Set keySet() {
         Set keys = new HashSet();
 
         for (int i = 0; i < table.length; i++) {
@@ -207,10 +214,11 @@ public class CustomMap<K, V> {
 
     /**
      * Возвращает коллекцию значений из нод
+     *
      * @return Set valuesSet
      */
-    public Set valueSet(){
-        Set values = new HashSet();
+    public Set<V> valueSet() {
+        Set<V> values = new HashSet<>();
 
         for (int i = 0; i < table.length; i++) {
             Node<K, V> thisNode = table[i];
@@ -225,6 +233,7 @@ public class CustomMap<K, V> {
 
         return values;
     }
+
 
 
     /* ----------------  «UPDATE» OPERATIONS -------------- */
@@ -275,6 +284,7 @@ public class CustomMap<K, V> {
 
     /**
      * Метод удаляет ноду с первым обнаруженным вхождением значения
+     *
      * @param value значение, по которому отбирается нода на удаление
      * @return true если удаление завершено успешно, false в ином случае
      */
@@ -289,10 +299,10 @@ public class CustomMap<K, V> {
                 if (thisNode.getValue().equals(value)) {
                     if (prevNode != null) {
                         prevNode.setNext(thisNode.getNext());
-                            return true;
+                        return true;
                     } else if (prevNode == null) {
                         table[i] = table[i].getNext();
-                            return true;
+                        return true;
                     }
                 }
                 prevNode = thisNode;
@@ -305,6 +315,7 @@ public class CustomMap<K, V> {
 
     /**
      * Метод удаляет ноды с соотсветсвующим значением
+     *
      * @param value значение, по которому отбираются ноды на удаление
      * @return true если удаление завершено успешно один и более раз, false в ином случае
      */
@@ -331,7 +342,7 @@ public class CustomMap<K, V> {
             }
         }
 
-        return (countRemoved > 0) ? true : false;
+        return countRemoved > 0;
     }
 
     // TODO: переопределить equals() и hashCode() для CustomMap
@@ -353,7 +364,66 @@ public class CustomMap<K, V> {
         return sb.toString();
     }
 
-    private static class Node<K, V> {
+    @Override
+    public Iterator iterator() {
+        return new Iterator(this);
+    }
+
+    class Iterator implements java.util.Iterator<Node<K, V>> {
+
+        Node<K, V> currentNode;
+        int currentIndex;
+        boolean firstStep = true; // флаг захода в мапу, костыль для решения проблемы "стартовая позиция должна указать на индекс [-1]"
+
+
+        public Iterator(CustomMap<K, V> map) { //todo: обработать случай, когда map == null!
+            this.currentIndex = 0;
+            this.currentNode = table[currentIndex];
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (currentNode != null && currentNode.getNext() != null) {
+                return true;
+            } else {
+                if (!firstStep) {
+                    currentIndex++;
+                }
+                for (int i = currentIndex; i < currentCapacity; i++) {
+                    if (table[i] != null) {
+                        currentIndex = i;
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public Node<K, V> next() {
+            if (firstStep && currentNode != null) {
+                firstStep = false;
+                return currentNode;
+            } else {
+                firstStep = false;
+            }
+            if (currentNode != null && currentNode.getNext() != null) {
+                currentNode = currentNode.getNext();
+            } else {
+                for (int i = currentIndex; i < currentCapacity; i++) {
+                    if (table[i] != null) {
+                        currentIndex = i;
+                        break;
+                    }
+                }
+                currentNode = table[currentIndex];
+            }
+
+            return currentNode;
+        }
+    }
+
+    static class Node<K, V> {
         final int hash;
         final K key;
         V value;
