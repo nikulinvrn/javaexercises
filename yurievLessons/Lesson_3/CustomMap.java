@@ -1,7 +1,9 @@
 package yurievLessons.Lesson_3;
 
+// TODO: добавить к сравнению еще и проверку ключей, а не только хешей
+
+
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 
@@ -48,7 +50,8 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
         } else {
             while (thisNode != null) {
                 if (thisNode.getKey().hashCode() == hash) {
-                    thisNode = new Node<>(hash, key, value, thisNode.getNext()); // если ключ существует — переписываем ноду
+                    thisNode = new Node<>(hash, key, value, thisNode.getNext()); // если хеш совпадает — переписываем ноду
+                                                                                 // вероятна проблема совпадения хешей при разных ключах!
                     if (prevNode != null) {
                         prevNode.setNext(thisNode);
                     }
@@ -61,8 +64,16 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
                 prevNode = thisNode;
                 thisNode = thisNode.getNext();
             }
-        } // TODO: реализовать сортировку. Сортировку проводить после добавления элемента.
+        }
+        // TODO: реализовать сортировку. Сортировку проводить после или во время добавления элемента?
         //       После сортировки реализовать метод бинарного поиска требуемой ноды.
+
+        /*       По идее, сортировку можно внедрить начиная с 59 стоки.
+                 Перед проверкой на пустоту следующей позиции проверяем больше ли хеш вставляемого значения.
+                 Если хеш вставляемого значения больше, то идем дальше и проверяем на пустоту следующую позицию.
+                 Если хеш вставляемого значения меньше, то в предыдущую ноду вписываем вставляемую, а в вставляемую -
+                 записываем ссылку на следующую ноду, хеш которой больше.
+                 */
 
         return false;
     }
@@ -288,7 +299,8 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
      * @param value значение, по которому отбирается нода на удаление
      * @return true если удаление завершено успешно, false в ином случае
      */
-    public boolean removeByValue(V value) { // TODO: обдумать вариант с удалить последнее вхождение
+    public boolean removeByValue(V value) {
+        // TODO: обдумать вариант с удалить последнее вхождение
         for (int i = 0; i < table.length; i++) {
             Node<K, V> thisNode = table[i];
             Node<K, V> prevNode = null;
@@ -373,10 +385,13 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
 
         Node<K, V> currentNode;
         int currentIndex;
-        boolean firstStep = true; // флаг захода в мапу, костыль для решения проблемы "стартовая позиция должна указать на индекс [-1]"
+        boolean firstStep = true; /* флаг захода в мапу, костыль для решения проблемы
+                                     "стартовая позиция должна указать на индекс [-1]" */
 
-
-        public Iterator(CustomMap<K, V> map) { //todo: обработать случай, когда map == null!
+        public Iterator(CustomMap<K, V> map) {
+            //todo: как обработать случай, когда map == null? По идее, это
+            //     "исключительное поведение", а значит должно выбрасываться
+            //      исключение типа NullPointerException или около того
             this.currentIndex = 0;
             this.currentNode = table[currentIndex];
         }
