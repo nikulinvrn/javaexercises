@@ -20,6 +20,7 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
      * Инициализирует пустую таблицу пар "ключ : значение"
      */
     public CustomMap() {
+        this.table = new Node[currentCapacity];
         this.size = 0;
     }
 
@@ -37,43 +38,34 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
     public boolean put(K key, V value) {
         int hash = key.hashCode();
         int index = hash & (currentCapacity - 1);
-        if (table == null) {
-            table = new Node[currentCapacity];
-        }
-        Node<K, V> thisNode = table[index];
-        Node<K, V> prevNode = null;
+        Node<K, V> currentNode = table[index];
 
         if (table[index] == null) {
-            table[index] = new Node<>(hash, key, value, null); // если индекс пуст — создаем ноду
+            table[index] = new Node<>(hash, key, value, null);
             size++;
             return true;
-        } else {
-            while (thisNode != null) {
-                if (thisNode.getKey().hashCode() == hash) {
-                    thisNode = new Node<>(hash, key, value, thisNode.getNext()); // если хеш совпадает — переписываем ноду
-                                                                                 // вероятна проблема совпадения хешей при разных ключах!
-                    if (prevNode != null) {
-                        prevNode.setNext(thisNode);
-                    }
-                    return true;
-                } else if (thisNode.getNext() == null) {
-                    thisNode.setNext(new Node<>(hash, key, value, null));
-                    size++;
-                    return true;
-                }
-                prevNode = thisNode;
-                thisNode = thisNode.getNext();
-            }
         }
-        // TODO: реализовать сортировку. Сортировку проводить после или во время добавления элемента?
-        //       После сортировки реализовать метод бинарного поиска требуемой ноды.
+        while (currentNode != null) {
+            int currentNodeHash = currentNode.getKey().hashCode();
+            if (hash < currentNodeHash){
+                currentNode = new Node<>(hash, key, value, currentNode);
+                size++;
+                return true;
+            }
+            if (hash > currentNodeHash && currentNode.getNext() == null){
+                currentNode.setNext(new Node<>(hash, key, value, null));
+                size++;
+                return true;
+            }
+            if (hash > currentNodeHash && currentNode.getNext() != null
+                    && hash < currentNode.getNext().getKey().hashCode()){
+                currentNode.setNext(new Node<>(hash, key, value, currentNode.getNext()));
+                size++;
+                return true;
+            }
 
-        /*       По идее, сортировку можно внедрить начиная с 59 стоки.
-                 Перед проверкой на пустоту следующей позиции проверяем больше ли хеш вставляемого значения.
-                 Если хеш вставляемого значения больше, то идем дальше и проверяем на пустоту следующую позицию.
-                 Если хеш вставляемого значения меньше, то в предыдущую ноду вписываем вставляемую, а в вставляемую -
-                 записываем ссылку на следующую ноду, хеш которой больше.
-                 */
+            currentNode = currentNode.getNext();
+        }
 
         return false;
     }
@@ -96,7 +88,7 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
             }
         }
 
-        return (countModification > 0) ? true : false;
+        return countModification > 0;
     }
 
     /**
@@ -129,7 +121,7 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
      * @return true если мапа пустая (null или size = 0), false в любом ином случае
      */
     public boolean isEmpty() {
-        return (this == null || this.size() == 0) ? true : false;
+        return this == null || this.size() == 0;
     }
 
     /**
@@ -138,14 +130,14 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
      */
     public V getValue(K key) {
         int hash = key.hashCode();
-        for (Node node : table) {
+        for (Node<K, V> node : table) {
             if (node == null) {
                 continue;
             }
             Node<K, V> temp = node;
             while (temp != null) {
                 if (temp.getKey().hashCode() == hash) {
-                    return (V) temp.getValue();
+                    return temp.getValue();
                 }
                 temp = temp.getNext();
             }
@@ -162,16 +154,16 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
      */
     public boolean containsKey(K key) {
         int hash = key.hashCode();
-        for (int i = 0; i < table.length; i++) {
-            Node<K, V> thisNode = table[i];
-            if (thisNode == null) {
+        for (Node<K, V> rootNode : table) {
+            Node<K, V> currentNode = rootNode;
+            if (currentNode == null) {
                 continue;
             }
-            while (thisNode != null) {
-                if (thisNode.getKey().hashCode() == hash) {
+            while (currentNode != null) {
+                if (currentNode.getKey().hashCode() == hash) {
                     return true;
                 }
-                thisNode = thisNode.getNext();
+                currentNode = currentNode.getNext();
             }
         }
 
@@ -185,16 +177,16 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
      * @return true если нода по ключу найдена, false в ином случае
      */
     public boolean containsValue(V value) {
-        for (int i = 0; i < table.length; i++) {
-            Node<K, V> thisNode = table[i];
-            if (thisNode == null) {
+        for (Node<K, V> rootNode : table) {
+            Node<K, V> currentNode = rootNode;
+            if (currentNode == null) {
                 continue;
             }
-            while (thisNode != null) {
-                if (thisNode.getValue().equals(value)) {
+            while (currentNode != null) {
+                if (currentNode.getValue().equals(value)) {
                     return true;
                 }
-                thisNode = thisNode.getNext();
+                currentNode = currentNode.getNext();
             }
         }
 
@@ -206,17 +198,17 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
      *
      * @return Set keySet
      */
-    public Set keySet() {
-        Set keys = new HashSet();
+    public Set<K> keySet() {
+        Set<K> keys = new HashSet<K>();
 
-        for (int i = 0; i < table.length; i++) {
-            Node<K, V> thisNode = table[i];
-            if (thisNode == null) {
+        for (Node<K, V> rootNode : table) {
+            Node<K, V> currentNode = rootNode;
+            if (currentNode == null) {
                 continue;
             }
-            while (thisNode != null) {
-                keys.add(thisNode.getKey());
-                thisNode = thisNode.getNext();
+            while (currentNode != null) {
+                keys.add(currentNode.getKey());
+                currentNode = currentNode.getNext();
             }
         }
 
@@ -231,14 +223,14 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
     public Set<V> valueSet() {
         Set<V> values = new HashSet<>();
 
-        for (int i = 0; i < table.length; i++) {
-            Node<K, V> thisNode = table[i];
-            if (thisNode == null) {
+        for (Node<K, V> rootNode : table) {
+            Node<K, V> currentNode = rootNode;
+            if (currentNode == null) {
                 continue;
             }
-            while (thisNode != null) {
-                values.add(thisNode.getValue());
-                thisNode = thisNode.getNext();
+            while (currentNode != null) {
+                values.add(currentNode.getValue());
+                currentNode = currentNode.getNext();
             }
         }
 
@@ -362,7 +354,7 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("CustomMap:\n");
-        for (Node node : table) {
+        for (Node<K,V> node : table) {
             if (node != null) {
                 Node<K, V> thisNodeInIndex = node;
                 sb.append("{");
@@ -468,7 +460,7 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
         }
 
         public String toString() {
-            return "[" + key + " = " + value + "]";
+            return "[" + hash + "::" + key + " = " + value + "]";
         }
 
         @Override
