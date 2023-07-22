@@ -1,20 +1,18 @@
 package yurievLessons.Lesson_3;
 
-// TODO: добавить к сравнению еще и проверку ключей, а не только хешей
-
-
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
     final int DEFAULT_CAPACITY = 16;
 
-    private Node<K, V>[] table;
+    private Node[] table;
 
     //на случай реализации авторесайза индексной таблицы
     private int currentCapacity = DEFAULT_CAPACITY;
     private int size;
+    private int[] numberOfNodesInIndexes = new int[currentCapacity]; // если делать расширение, то придется в ArrayList
+    // или делать в методе расширения массива индексов
+    // расширение и массива емкости индексов
 
     /**
      * Инициализирует пустую таблицу пар "ключ : значение"
@@ -35,7 +33,7 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
      * @param value значение
      * @return {@code true} если добавление прошло успешно, {@code false} если добавление не удалось
      */
-    public boolean put(K key, V value) {
+    public boolean put(K key, V value) { //не обработан случай равенства хешей
         int hash = key.hashCode();
         int index = hash & (currentCapacity - 1);
         Node<K, V> currentNode = table[index];
@@ -43,24 +41,33 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
         if (table[index] == null) {
             table[index] = new Node<>(hash, key, value, null);
             size++;
+            numberOfNodesInIndexes[index]++;
             return true;
         }
         while (currentNode != null) {
             int currentNodeHash = currentNode.getKey().hashCode();
-            if (hash < currentNodeHash){
-                currentNode = new Node<>(hash, key, value, currentNode);
-                size++;
+            if (hash == currentNodeHash && currentNode.getKey().equals(key)) {
+                currentNode = new Node<>(hash, key, value, currentNode.getNext());
                 return true;
             }
-            if (hash > currentNodeHash && currentNode.getNext() == null){
+
+            if (hash < currentNodeHash) {
+                currentNode = new Node<>(hash, key, value, currentNode);
+                size++;
+                numberOfNodesInIndexes[index]++;
+                return true;
+            }
+            if (hash > currentNodeHash && currentNode.getNext() == null) {
                 currentNode.setNext(new Node<>(hash, key, value, null));
                 size++;
+                numberOfNodesInIndexes[index]++;
                 return true;
             }
             if (hash > currentNodeHash && currentNode.getNext() != null
-                    && hash < currentNode.getNext().getKey().hashCode()){
+                    && hash < currentNode.getNext().getKey().hashCode()) {
                 currentNode.setNext(new Node<>(hash, key, value, currentNode.getNext()));
                 size++;
+                numberOfNodesInIndexes[index]++;
                 return true;
             }
 
@@ -271,9 +278,13 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
                 if (thisNode.getKey().hashCode() == hash) {
                     if (prevNode != null) {
                         prevNode.setNext(thisNode.getNext());
+                        size--;
+                        numberOfNodesInIndexes[i]--;
                         return true;
                     } else if (prevNode == null) {
                         table[i] = table[i].getNext();
+                        size--;
+                        numberOfNodesInIndexes[i]++;
                         return true;
                     }
                 }
@@ -292,7 +303,6 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
      * @return true если удаление завершено успешно, false в ином случае
      */
     public boolean removeByValue(V value) {
-        // TODO: обдумать вариант с удалить последнее вхождение
         for (int i = 0; i < table.length; i++) {
             Node<K, V> thisNode = table[i];
             Node<K, V> prevNode = null;
@@ -303,9 +313,13 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
                 if (thisNode.getValue().equals(value)) {
                     if (prevNode != null) {
                         prevNode.setNext(thisNode.getNext());
+                        size--;
+                        numberOfNodesInIndexes[i]--;
                         return true;
                     } else if (prevNode == null) {
                         table[i] = table[i].getNext();
+                        size--;
+                        numberOfNodesInIndexes[i]--;
                         return true;
                     }
                 }
@@ -335,9 +349,13 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
                 if (thisNode.getValue().equals(value)) {
                     if (prevNode != null) {
                         prevNode.setNext(thisNode.getNext());
+                        size--;
+                        numberOfNodesInIndexes[i]--;
                         countRemoved++;
                     } else if (prevNode == null) {
                         table[i] = table[i].getNext();
+                        size--;
+                        numberOfNodesInIndexes[i]--;
                         countRemoved++;
                     }
                 }
@@ -349,12 +367,71 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
         return countRemoved > 0;
     }
 
-    // TODO: переопределить equals() и hashCode() для CustomMap
+
+    /*-------------------------------< UTILITIES >-------------------------------*/
+
+
+    /**
+     * Метод реализует бинарный поиск по ключу в рамках каждого листа,
+     * в индексах базового массива.
+     * <p>
+     * Абсолютно неадекватная наркомания с точки зрения применимости.
+     * Но раз надо... "Пункт 1: Старший по званию всегда прав.
+     *                 Пункт 2: Если старший по званию не прав - см. п. 1"
+     *
+     * @param foundKey ключ, по которому ищем ноду
+     * @return искомую ноду или null, если ничего не нашел
+     */
+    public Node<K, V> binaryFindByKeyInIndexes(K foundKey) {
+        Node<K, V> indexNode = table[foundKey.hashCode() & (currentCapacity - 1)];
+        ArrayList<Node<K, V>> indexList = new ArrayList<>();
+        do {
+            indexList.add(indexNode);
+            indexNode = indexNode.getNext();
+        } while (indexNode != null);
+
+        int start = 0;
+        int end = indexList.size() - 1;
+        while (start <= end) {
+            int middle = (start + end) / 2;
+            if (indexList.get(middle).getKey().hashCode() == foundKey.hashCode()) {
+                return indexList.get(middle);
+            }
+            if (indexList.get(middle).getKey().hashCode() > foundKey.hashCode()) {
+                end = middle - 1;
+            }
+            if (indexList.get(middle).getKey().hashCode() < foundKey.hashCode()) {
+                start = middle + 1;
+            }
+        }
+
+        return null;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CustomMap<?, ?> customMap = (CustomMap<?, ?>) o;
+        return currentCapacity == customMap.currentCapacity
+                && size == customMap.size
+                && Arrays.equals(table, customMap.table)
+                && Arrays.equals(numberOfNodesInIndexes, customMap.numberOfNodesInIndexes);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(currentCapacity, size);
+        result = 31 * result + Arrays.hashCode(table);
+        result = 31 * result + Arrays.hashCode(numberOfNodesInIndexes);
+        return result;
+    }
 
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("CustomMap:\n");
-        for (Node<K,V> node : table) {
+        for (Node<K, V> node : table) {
             if (node != null) {
                 Node<K, V> thisNodeInIndex = node;
                 sb.append("{");
@@ -381,7 +458,7 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
                                      "стартовая позиция должна указать на индекс [-1]" */
 
         public Iterator(CustomMap<K, V> map) {
-            //todo: как обработать случай, когда map == null? По идее, это
+            //  todo: как обработать случай, когда map == null? По идее, это
             //     "исключительное поведение", а значит должно выбрасываться
             //      исключение типа NullPointerException или около того
             this.currentIndex = 0;
@@ -429,6 +506,7 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
             return currentNode;
         }
     }
+
 
     static class Node<K, V> {
         final int hash;
