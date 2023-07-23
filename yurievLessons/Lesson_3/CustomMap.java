@@ -4,15 +4,11 @@ import java.util.*;
 
 public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
     final int DEFAULT_CAPACITY = 16;
-
-    private Node[] table;
-
-    //на случай реализации авторесайза индексной таблицы
+    private Node<K,V>[] table;
     private int currentCapacity = DEFAULT_CAPACITY;
     private int size;
-    private int[] numberOfNodesInIndexes = new int[currentCapacity]; // если делать расширение, то придется в ArrayList
-    // или делать в методе расширения массива индексов
-    // расширение и массива емкости индексов
+    // необходимо для реализации бинарного поиска
+    private int[] numberOfNodesInIndexes = new int[currentCapacity];
 
     /**
      * Инициализирует пустую таблицу пар "ключ : значение"
@@ -33,7 +29,7 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
      * @param value значение
      * @return {@code true} если добавление прошло успешно, {@code false} если добавление не удалось
      */
-    public boolean put(K key, V value) { //не обработан случай равенства хешей
+    public boolean put(K key, V value) {
         int hash = key.hashCode();
         int index = hash & (currentCapacity - 1);
         Node<K, V> currentNode = table[index];
@@ -206,7 +202,7 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
      * @return Set keySet
      */
     public Set<K> keySet() {
-        Set<K> keys = new HashSet<K>();
+        Set<K> keys = new HashSet<>();
 
         for (Node<K, V> rootNode : table) {
             Node<K, V> currentNode = rootNode;
@@ -243,10 +239,6 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
 
         return values;
     }
-
-
-
-    /* ----------------  «UPDATE» OPERATIONS -------------- */
 
 
 
@@ -332,7 +324,7 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
     }
 
     /**
-     * Метод удаляет ноды с соотсветсвующим значением
+     * Метод удаляет ноды с соответствующим значением
      *
      * @param value значение, по которому отбираются ноды на удаление
      * @return true если удаление завершено успешно один и более раз, false в ином случае
@@ -538,7 +530,7 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
         }
 
         public String toString() {
-            return "[" + hash + "::" + key + " = " + value + "]";
+            return "[" + key + " = " + value + "]";
         }
 
         @Override
