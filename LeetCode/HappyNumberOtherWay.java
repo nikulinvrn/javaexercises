@@ -1,5 +1,6 @@
 package LeetCode;
 
+
 public class HappyNumberOtherWay {
     public static void main(String[] args) {
         System.out.println(isHappy(19));
