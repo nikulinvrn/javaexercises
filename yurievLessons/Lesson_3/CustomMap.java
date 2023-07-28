@@ -7,7 +7,7 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
     private Node<K,V>[] table;
     private int currentCapacity = DEFAULT_CAPACITY;
     private int size;
-    // необходимо для реализации бинарного поиска
+    //  число нод в каждом индексе необходимо для реализации бинарного поиска
     private int[] numberOfNodesInIndexes = new int[currentCapacity];
 
     /**
@@ -46,7 +46,6 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
                 currentNode = new Node<>(hash, key, value, currentNode.getNext());
                 return true;
             }
-
             if (hash < currentNodeHash) {
                 currentNode = new Node<>(hash, key, value, currentNode);
                 size++;
@@ -450,9 +449,6 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
                                      "стартовая позиция должна указать на индекс [-1]" */
 
         public Iterator(CustomMap<K, V> map) {
-            //  todo: как обработать случай, когда map == null? По идее, это
-            //     "исключительное поведение", а значит должно выбрасываться
-            //      исключение типа NullPointerException или около того
             this.currentIndex = 0;
             this.currentNode = table[currentIndex];
         }
@@ -547,10 +543,3 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
         }
     }
 }
-
-
-
-
-
-
-
