@@ -1,4 +1,4 @@
-package yurievLessons.OtherLessons;
+package OtherLessons;
 
 import java.util.HashMap;
 import java.util.Iterator;

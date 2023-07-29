@@ -1,6 +1,4 @@
-package yurievLessons.OtherLessons;
-
-import java.util.Iterator;
+package OtherLessons;
 
 public class CustomIterator {
     public static void main(String[] args) {
