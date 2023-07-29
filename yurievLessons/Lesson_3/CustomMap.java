@@ -143,7 +143,7 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
      *         пару ключ-значение
      */
     public boolean isEmpty() {
-        return this == null || this.size() == 0;
+        return this.size() == 0;
     }
 
     /**
@@ -154,7 +154,12 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
      * @return значение, соответствующее ключу {@code key}
      *         или {@code null}, если ключа не существует
      */
-    public V getValue(K key) {
+    public V getValue(K key){
+        /* javax validation (jakarta validation) - пакет валидации, с 11 встроенный.
+        * TODO: посмотреть аннотации, подготовиться к беседе насчет валидаций
+        *       посмотреть хуиз грэдл (контроль зависимостей)
+        * TODO: создать проект с грэдлом, перенести код мапы туда, расставвить аннотации
+        */
         int hash = key.hashCode();
         for (Node<K, V> node : table) {
             if (node == null) {
@@ -187,7 +192,8 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
                 continue;
             }
             while (currentNode != null) {
-                if (currentNode.getKey().hashCode() == hash) {
+                if (currentNode.getKey().hashCode() == hash
+                        && currentNode.getKey().equals(key)) {
                     return true;
                 }
                 currentNode = currentNode.getNext();
@@ -341,10 +347,10 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
         for (int i = 0; i < table.length; i++) {
             Node<K, V> thisNode = table[i];
             Node<K, V> prevNode = null;
-            if (thisNode == null) {
+            if (Objects.isNull(thisNode)) { // TODO: попробовать привыкнуть к Objects
                 continue;
             }
-            while (thisNode != null) {
+            while (Objects.nonNull(thisNode)) {
                 if (thisNode.getValue().equals(value)) {
                     if (prevNode != null) {
                         prevNode.setNext(thisNode.getNext());
@@ -372,9 +378,10 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
      *
      * @param value значение, по которому отбираются пары "ключ-значение" на удаление
      *
-     * @return {@code true} если удаление прошло успешно, {@code false} в ином случае
+     * @return число удалений (количество удаленных пар "ключ-значение") если удаление
+     *         прошло успешно
      */
-    public boolean removeAllByValue(V value) {
+    public int removeAllByValue(V value) {
         int countRemoved = 0;
         for (int i = 0; i < table.length; i++) {
             Node<K, V> thisNode = table[i];
@@ -401,7 +408,7 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
             }
         }
 
-        return countRemoved > 0;
+        return countRemoved;
     }
 
 
@@ -552,7 +559,7 @@ public class CustomMap<K, V> implements Iterable<CustomMap.Node<K, V>> {
 
 
 
-    static class Node<K, V> {
+    protected static class Node<K, V> { // TODO: thread Safety policy: не всегда GC чистит корректно вложенные статики
         final int hash;
         final K key;
         V value;

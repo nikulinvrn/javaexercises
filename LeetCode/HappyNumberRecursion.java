@@ -45,10 +45,10 @@ public class HappyNumberRecursion {
         int inputNumber = n;
         int cycleMarker = n;
 
-        return StepOfRecursion(inputNumber, cycleMarker);
+        return stepOfRecursion(inputNumber, cycleMarker);
     }
 
-    public static boolean StepOfRecursion(int lastNumberOfStep, int fasterNumberOfStep){
+    public static boolean stepOfRecursion(Integer lastNumberOfStep, Integer fasterNumberOfStep){ // обертки передают копию ссылки, а не копию объекта в памяти
         lastNumberOfStep = sumQrtOfDigits(lastNumberOfStep);
         fasterNumberOfStep = sumQrtOfDigits(sumQrtOfDigits(fasterNumberOfStep));
 
@@ -58,7 +58,7 @@ public class HappyNumberRecursion {
             return false;
         }
 
-        return StepOfRecursion(lastNumberOfStep, fasterNumberOfStep);
+        return stepOfRecursion(lastNumberOfStep, fasterNumberOfStep);
     }
 
     private static int[] splitNumberToDigits(int number) {
